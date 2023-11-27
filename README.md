@@ -13,7 +13,6 @@
   <li>tailwind css :- for CSS</li>
   <li>react-toastify :- for giving better UI notification.</li>
 </ul>
-<hr>
 <br>
 <h1>Server</h1>
 <h3>Dependensies :-</h3>
