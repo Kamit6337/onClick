@@ -57,6 +57,12 @@ const globalErrorHandler = (err, req, res, next) => {
     err.message = "Please check your URL or you API key or Bearer Token.";
   }
 
+  if (err.name === "InternalOAuthError") {
+    err.statusCode = 403;
+    err.status = "Login Error";
+    err.message = "Error in Login. Please login again...";
+  }
+
   const errorResponse = {
     status: err.status,
     message: err.message, // Include the message property
