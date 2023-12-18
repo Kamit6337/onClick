@@ -1,6 +1,6 @@
 import { environment } from "../../utils/environment.js";
-import HandleGlobalError from "../utils/HandleGlobalError.js";
-import catchAsyncError from "../utils/catchAsyncError.js";
+import HandleGlobalError from "../../utils/HandleGlobalError.js";
+import catchAsyncError from "../../utils/catchAsyncError.js";
 import jwt from "jsonwebtoken";
 
 const generateWebToken = (id) => {
