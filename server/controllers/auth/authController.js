@@ -1,13 +1,8 @@
 import { environment } from "../../utils/environment.js";
 import HandleGlobalError from "../../utils/HandleGlobalError.js";
 import catchAsyncError from "../../utils/catchAsyncError.js";
-import jwt from "jsonwebtoken";
-
-const generateWebToken = (id) => {
-  return jwt.sign({ id }, environment.JWT_SECRET_KEY, {
-    expiresIn: environment.JWT_EXPIRES_IN,
-  });
-};
+import generateWebToken from "../../utils/generateWebToken.js";
+import { User } from "../../models/userModel.js";
 
 // NOTE: UPDATE USER
 export const updateUser = catchAsyncError(async (req, res) => {
@@ -41,7 +36,23 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
 
   // WORK: IF NOT FIND USER
   if (!findUser) {
-    const token = generateWebToken(createUser._id);
+    // WORK: CREATE USER
+    const createUser = await User.create({
+      name,
+      email,
+      photo: picture,
+      OAuthId: id,
+      OAuthProvider: provider,
+    });
+
+    if (!createUser) {
+      return next(new HandleGlobalError("Issue in Signup", 404));
+    }
+
+    const token = generateWebToken({
+      id: createUser._id,
+      role: createUser.role,
+    });
 
     res.cookie("token", token, {
       expires: new Date(Date.now() + environment.JWT_EXPIRES_IN),
@@ -49,15 +60,20 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
     });
 
     res.status(200).json({
-      name,
-      photo: picture,
-      email,
+      message: "Login Successfully",
+      name: createUser.name,
+      photo: createUser.photo,
+      email: createUser.email,
+      role: createUser.role,
     });
     return;
   }
 
   // WORK: IF FIND USER
-  const token = generateWebToken(findUser._id);
+  const token = generateWebToken({
+    id: findUser._id,
+    role: findUser.role,
+  });
 
   res.cookie("token", token, {
     expires: new Date(Date.now() + environment.JWT_EXPIRES_IN),
@@ -65,10 +81,11 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
   });
 
   res.status(200).json({
-    login: true,
-    name,
-    photo: picture,
-    email,
+    message: "Login Successfully",
+    name: findUser.name,
+    photo: findUser.photo,
+    email: findUser.email,
+    role: findUser.role,
   });
   return;
 });
