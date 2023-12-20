@@ -9,6 +9,13 @@
 <p><i><strong>Copy this repository url.</strong></i></p>
 <p>In command line, type : <i><strong>git clone {repository url} ./</strong></i></p>
 
+<h3>For pushing to remote repository</h3>
+<p>Create a repository in github and copy the url</p>
+<p>In main command line : <i><strong>git remote set-url origin {new-repository-url}
+</strong></i></p>
+<p>To check the remote url : <i><strong>git remote -v</strong></i></p>
+<p>To push to remote repository : <i><strong>git push</strong></i></p>
+
 <h1>Step 2 :</h1>
 <h2>Go to Server directory by typing : <i><strong>cd server</strong></i> in command line</h2>
 <p>First type this command : <i><strong>ncu -u</strong></i></p>
