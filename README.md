@@ -9,7 +9,7 @@
 <p><i><strong>Copy this repository url.</strong></i></p>
 <p>In command line, type : <i><strong>git clone {repository url} ./</strong></i></p>
 
-<h3>For pushing to remote repository</h3>
+<h2>For pushing to remote repository</h2>
 <p>Create a repository in github and copy the url</p>
 <p>In main command line : <i><strong>git remote set-url origin {new-repository-url}
 </strong></i></p>
