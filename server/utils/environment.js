@@ -5,7 +5,7 @@ export const environment = {
   PORT: process.env.PORT,
   mongoDB_url: process.env.mongoDB_URL,
   CLIENT_URL: process.env.CLIENT_URL,
-  CLIENT_CHECKLOGIN_URL: process.env.CLIENT_CHECKLOGIN_URL,
+  CLIENT_CHECKLOGIN_URL: `${process.env.CLIENT_URL}/login/check`,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_OAUTH_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_OAUTH_CLIENT_SECRET,
   SERVER_URL: `http://localhost:${process.env.PORT}`,

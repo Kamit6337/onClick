@@ -6,9 +6,8 @@ import Loading from "../../components/Loading";
 import environment from "../../utils/environment";
 import { postAuthReq } from "../../utils/api/authApi";
 import { useMutation } from "@tanstack/react-query";
-import { encryptString } from "../../utils/crypto/crypto_js";
-import Cookies from "js-cookie";
 import validator from "validator";
+import createCookies from "../../utils/crypto/createCookies";
 
 const SERVER_URL = environment.SERVER_URL;
 
@@ -19,7 +18,7 @@ const SignUp = () => {
     confirmPassword: false,
   });
 
-  const { isLoading, mutate, data, error, isError } = useMutation({
+  const { isLoading, mutate, error, isError, isSuccess } = useMutation({
     mutationKey: ["signup"],
     mutationFn: (body) => postAuthReq("/signup", body),
     cacheTime: Infinity,
@@ -42,17 +41,11 @@ const SignUp = () => {
   });
 
   useEffect(() => {
-    if (data) {
-      const encrypt = encryptString(environment.CRYPTO_SECRET_VALUE);
-      Cookies.set("_at", encrypt, {
-        expires: 7,
-        secure: true,
-        path: "/",
-        sameSite: true,
-      });
+    if (isSuccess) {
+      createCookies();
       navigate("/");
     }
-  }, [data, navigate]);
+  }, [isSuccess, navigate]);
 
   const onSubmit = async (data) => {
     const { confirmPassword, ...formData } = data;
