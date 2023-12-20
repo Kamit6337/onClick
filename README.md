@@ -6,38 +6,38 @@
 <h1>Step 1 :</h1>
 <p>Create a folder for your dream project.</p>
 <p>Open the folder in VS Code and go to terminal.</p>
-<p><i>Copy this repository url.</i></p>
-<p>In command line, type : <i>git clone {repository url} ./</i></p>
+<p><i><strong>Copy this repository url.</strong></i></p>
+<p>In command line, type : <i><strong>git clone {repository url} ./</strong></i></p>
 
 <h1>Step 2 :</h1>
-<h2>Go to Server directory by typing : <i>cd server</i> in command line</h2>
-<p>First type this command : <i>ncu -u</i></p>
-<p>Second type this command : <i>npm install</i></p>
+<h2>Go to Server directory by typing : <i><strong>cd server</strong></i> in command line</h2>
+<p>First type this command : <i><strong>ncu -u</strong></i></p>
+<p>Second type this command : <i><strong>npm install</strong></i></p>
 
 <h3>Server Environment Variables</h3>
 <p>Copy all this variables and paste it in .env file inside server folder and fill the value accordingly.</p>
-<p><i>PORT</i> generally 8000</p>
-<p><i>CLIENT_URL</i></p>
-<p><i>mongoDB_USERNAME</i></p>
-<p><i>mongoDB_PASSWORD</i></p>
-<p><i>mongoDB_URL</i></p>
-<p><i>GOOGLE_OAUTH_CLIENT_ID</i></p>
-<p><i>GOOGLE_OAUTH_CLIENT_SECRET</i></p>
-<p><i>FACEBOOK_OAUTH_APP_ID</i></p>
-<p><i>FACEBOOK_OAUTH_APP_SECRET</i></p>
-<p><i>JWT_SECRET_KEY</i></p>
-<p><i>JWT_EXPIRES_IN</i> in milliseconds</p>
+<p><i><strong>PORT</strong></i> generally 8000</p>
+<p><i><strong>CLIENT_URL</strong></i></p>
+<p><i><strong>mongoDB_USERNAME</strong></i></p>
+<p><i><strong>mongoDB_PASSWORD</strong></i></p>
+<p><i><strong>mongoDB_URL</strong></i></p>
+<p><i><strong>GOOGLE_OAUTH_CLIENT_ID</strong></i></p>
+<p><i><strong>GOOGLE_OAUTH_CLIENT_SECRET</strong></i></p>
+<p><i><strong>FACEBOOK_OAUTH_APP_ID</strong></i></p>
+<p><i><strong>FACEBOOK_OAUTH_APP_SECRET</strong></i></p>
+<p><i><strong>JWT_SECRET_KEY</strong></i></p>
+<p><i><strong>JWT_EXPIRES_IN</strong></i> in milliseconds</p>
 
 <h1>Step 3 :</h1>
-<h2>Go to Client directory by typing : <i>cd ../client</i> in command line</h2>
-<p>First type this command : <i>ncu -u</i></p>
-<p>Second type this command : <i>npm install</i></p>
+<h2>Go to Client directory by typing : <i><strong>cd ../client</strong></i> in command line</h2>
+<p>First type this command : <i><strong>ncu -u</strong></i></p>
+<p>Second type this command : <i><strong>npm install</strong></i></p>
 
 <h3>Client Environment Variables</h3>
 <p>Copy all this variables and paste it in .env file inside client folder and fill the value accordingly.</p>
-<p><i>VITE_APP_SERVER_URL</i></p>
-<p><i>VITE_APP_CRYPTO_SECRET_KEY</i></p>
-<p><i>VITE_APP_CRYPTO_SECRET_VALUE</i></p>
+<p><i><strong>VITE_APP_SERVER_URL</strong></i></p>
+<p><i><strong>VITE_APP_CRYPTO_SECRET_KEY</strong></i></p>
+<p><i><strong>VITE_APP_CRYPTO_SECRET_VALUE</strong></strong></i></p>
 
 <h1>Server Dependensies :</h1>
 <ul>
