@@ -22,6 +22,7 @@ const userSchema = new mongoose.Schema(
     },
     password: {
       type: String,
+      default: null,
     },
     photo: {
       type: String,
@@ -30,9 +31,11 @@ const userSchema = new mongoose.Schema(
     OAuthId: {
       type: String,
       unique: true,
+      default: null,
     },
     OAuthProvider: {
       type: String,
+      default: null,
     },
     role: {
       type: String,
