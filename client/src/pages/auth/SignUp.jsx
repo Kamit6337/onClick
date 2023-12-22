@@ -21,7 +21,6 @@ const SignUp = () => {
   const { isLoading, mutate, error, isError, isSuccess } = useMutation({
     mutationKey: ["signup"],
     mutationFn: (body) => postAuthReq("/signup", body),
-    cacheTime: Infinity,
     retry: 3,
   });
 
@@ -36,7 +35,6 @@ const SignUp = () => {
       email: "",
       password: "",
       confirmPassword: "",
-      mobile: "",
     },
   });
 
@@ -118,11 +116,11 @@ const SignUp = () => {
         <div className="h-full w-[1px] bg-gray-300" />
 
         {/* WORK: FORM AND GO TO LOGIN BUTTON*/}
-        <div className="flex-1 flex flex-col  p-6">
+        <div className="flex-1 flex flex-col p-6 py-10">
           {/* WORK: SIGNUP FORM*/}
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="grid grid-rows-6 h-full w-full"
+            className="flex flex-col gap-2 h-full w-full"
           >
             {/* WORK: NAME FIELD*/}
             <div className="flex flex-col">
@@ -238,7 +236,7 @@ const SignUp = () => {
             </div>
 
             {/* WORK: MOBILE FIELD*/}
-            <div>
+            {/* <div>
               <input
                 type="text"
                 {...register("mobile", {
@@ -259,10 +257,10 @@ const SignUp = () => {
               <p role="alert" className="text-xs text-red-500 pl-2 h-4">
                 {errors.mobile && errors.mobile.message}
               </p>
-            </div>
+            </div> */}
 
             {/* WORK: SUBMIT BUTTON*/}
-            <div>
+            <div className="my-auto">
               <input
                 type="submit"
                 className="border border-slate-600 p-3 rounded-lg bg-purple-300 font-semibold text-lg tracking-wide cursor-pointer w-full"

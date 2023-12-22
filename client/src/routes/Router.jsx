@@ -12,7 +12,7 @@ const Router = () => {
   return (
     <Routes>
       {/* NOTE: HOME ROUTES */}
-      <Route path="/admin" element={<RootLayout />}>
+      <Route path="/" element={<RootLayout />}>
         <Route index element={<Home />} />
       </Route>
 

@@ -8,7 +8,7 @@
  */
 
 import jwt from "jsonwebtoken";
-import { environment } from "./environment";
+import { environment } from "./environment.js";
 
 const generateWebToken = (
   payload,

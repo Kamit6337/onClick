@@ -30,7 +30,6 @@ const userSchema = new mongoose.Schema(
     },
     OAuthId: {
       type: String,
-      unique: true,
       default: null,
     },
     OAuthProvider: {
@@ -68,7 +67,10 @@ userSchema.methods.checkPassword = function (given_password) {
 };
 
 userSchema.pre("save", function (next) {
-  this.password = bcrypt.hashSync(this.password, environment.SALT_ROUND);
+  // Check if there's a password to hash
+  if (this.password) {
+    this.password = bcrypt.hashSync(this.password, environment.SALT_ROUND);
+  }
 
   next();
 });

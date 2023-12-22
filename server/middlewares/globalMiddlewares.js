@@ -6,6 +6,8 @@ import passport from "passport";
 import cookieSession from "cookie-session";
 import { cookieSessionOptions } from "../utils/cookieSessionOptions.js";
 import { corsOptions } from "../utils/corsOptions.js";
+import session from "express-session";
+import expressSessionOptions from "../utils/expressSessionOptions.js";
 
 const globalMiddlewares = () => {
   const app = express();
@@ -18,10 +20,12 @@ const globalMiddlewares = () => {
 
   // Middleware to create a time session of cookie (login, jwt)
   // app.use(session(expressSessionOptions));
-  app.use(cookieSession(cookieSessionOptions));
+  // app.use(cookieSession(cookieSessionOptions));
+
+  app.use(session(expressSessionOptions));
 
   // Middleware to parse cookies
-  app.use(cookieParser());
+  // app.use(cookieParser());
 
   // Middleware to parse incoming body
   app.use(bodyParser.json());
@@ -35,11 +39,7 @@ const globalMiddlewares = () => {
   // Middleware to parse URL-encoded request bodies (optional)
   app.use(express.urlencoded({ extended: true }));
 
-  return (req, res, next) => {
-    // This function will be used as middleware when you call app.use(globalMiddlewares)
-    // You can perform additional actions if needed
-    next();
-  };
+  return app;
 };
 
 export default globalMiddlewares;

@@ -52,6 +52,7 @@ const login = catchAsyncError(async (req, res, next) => {
 
   res.status(200).json({
     message: "Login Successfully",
+    id: findUser._id,
     name: findUser.name,
     photo: findUser.photo,
     email: findUser.email,

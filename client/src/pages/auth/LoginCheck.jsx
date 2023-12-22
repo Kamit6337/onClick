@@ -1,36 +1,26 @@
-import { useQuery } from "@tanstack/react-query";
 import Loading from "../../components/Loading";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import Cookies from "js-cookie";
-import { encryptString } from "../../utils/crypto/crypto_js";
-import environment from "../../utils/environment";
-import { getAuthReq } from "../../utils/api/authApi";
+import createCookies from "../../utils/crypto/createCookies";
+import UseOAuthLogin from "../../hooks/UseOAuthLogin";
 
 const LoginCheck = () => {
   const navigate = useNavigate();
 
-  const { isLoading, isError, error, data } = useQuery({
-    queryKey: ["loginCheck"],
-    queryFn: async () => await getAuthReq("/login/OAuth"),
-    staleTime: Infinity,
-    cacheTime: Infinity,
-  });
+  const { isLoading, isError, error, isSuccess } = UseOAuthLogin();
 
   useEffect(() => {
     if (isError) {
-      navigate("/error", { state: { errMsg: error.message } });
-    } else if (data) {
-      const encrypt = encryptString(environment.CRYPTO_SECRET_VALUE);
-      Cookies.set("_at", encrypt, {
-        expires: 7,
-        secure: true,
-        path: "/",
-        sameSite: true,
+      navigate("/error", {
+        state: {
+          errMsg: error?.message || "Something Went Wrong",
+        },
       });
+    } else if (isSuccess) {
+      createCookies();
       navigate("/");
     }
-  }, [navigate, isError, data, error]);
+  }, [navigate, isError, isSuccess, error]);
 
   if (isLoading) {
     return <Loading />;

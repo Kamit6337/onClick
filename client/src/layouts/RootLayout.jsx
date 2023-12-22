@@ -1,30 +1,32 @@
 import { Outlet, useNavigate } from "react-router-dom";
-import Navbar from "../components/Navbar";
-import Footer from "../components/Footer";
-import { useQuery } from "@tanstack/react-query";
-import { getAuthReq } from "../utils/api/authApi";
 import { useEffect } from "react";
 import isUserLoggedIn from "../utils/crypto/isUserLoggedIn";
 import removeCookies from "../utils/crypto/removeCookies";
+import UseContinuousCheck from "../hooks/UseContinuousCheck";
+import UseAllUser from "../hooks/UseAllUser";
+import UseUserRooms from "../hooks/UseUserRooms";
+import Loading from "../components/Loading";
 
 const RootLayout = () => {
   const navigate = useNavigate();
-
   const { loggedIn } = isUserLoggedIn();
 
-  const { isError, error } = useQuery({
-    queryKey: ["continuousCheck"],
-    queryFn: () => getAuthReq("/login/check"),
-    enabled: loggedIn,
-    refetchInterval: 5 * 60 * 1000,
-  });
+  const { isError, error } = UseContinuousCheck(loggedIn);
+  const { isLoading: usersIsLoading, isError: usersIsError } =
+    UseAllUser(loggedIn);
+  const { isLoading: roomsIsLoading, isError: roomssIsError } =
+    UseUserRooms(loggedIn);
 
   useEffect(() => {
-    if (isError) {
-      navigate("/error", { state: { errMsg: error.message } });
+    if (isError || usersIsError || roomssIsError) {
+      navigate("/error", {
+        state: {
+          errMsg: error?.message || "Something went wrong. Please login Again",
+        },
+      });
       removeCookies();
     }
-  }, [isError, error, navigate]);
+  }, [isError, usersIsError, roomssIsError, error, navigate]);
 
   useEffect(() => {
     if (!loggedIn) {
@@ -34,12 +36,14 @@ const RootLayout = () => {
 
   if (!loggedIn) return;
 
+  if (usersIsLoading || roomsIsLoading) {
+    return <Loading />;
+  }
+
   return (
-    <>
-      <Navbar />
+    <main className="max-w-full h-screen">
       <Outlet />
-      <Footer />
-    </>
+    </main>
   );
 };
 

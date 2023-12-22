@@ -19,7 +19,7 @@ const signup = catchAsyncError(async (req, res, next) => {
     name,
     email,
     password,
-    photo: userPic,
+    photo: photo || userPic,
   });
 
   if (!createUser) {
@@ -38,6 +38,7 @@ const signup = catchAsyncError(async (req, res, next) => {
 
   res.status(200).json({
     message: "SignUp Successfully",
+    id: createUser._id,
     name: createUser.name,
     photo: createUser.photo,
     email: createUser.email,

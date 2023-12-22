@@ -7,7 +7,7 @@
  */
 
 import jwt from "jsonwebtoken";
-import { environment } from "./environment";
+import { environment } from "./environment.js";
 
 const verifyWebToken = (token, secret = environment.JWT_SECRET_KEY) => {
   try {

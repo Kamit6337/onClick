@@ -28,7 +28,6 @@ const Login = () => {
   const { isLoading, mutate, error, isError, isSuccess } = useMutation({
     mutationKey: ["login"],
     mutationFn: (body) => postAuthReq("/login", body),
-    cacheTime: Infinity,
     retry: 3,
   });
 

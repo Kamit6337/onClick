@@ -32,11 +32,13 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
     _json: { name, email, picture },
   } = req.user;
 
-  const findUser = await User.findOne({ id });
+  const findUser = await User.findOne({ OAuthId: id });
 
   // WORK: IF NOT FIND USER
   if (!findUser) {
     // WORK: CREATE USER
+
+    console.log("new user is creating");
     const createUser = await User.create({
       name,
       email,
@@ -61,6 +63,7 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
 
     res.status(200).json({
       message: "Login Successfully",
+      id: createUser._id,
       name: createUser.name,
       photo: createUser.photo,
       email: createUser.email,
@@ -82,6 +85,7 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
 
   res.status(200).json({
     message: "Login Successfully",
+    id: findUser._id,
     name: findUser.name,
     photo: findUser.photo,
     email: findUser.email,

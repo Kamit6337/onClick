@@ -2,9 +2,10 @@ import HandleGlobalError from "../../../utils/HandleGlobalError.js";
 import catchAsyncError from "../../../utils/catchAsyncError.js";
 import { User } from "../../../models/userModel.js";
 import verifyWebToken from "../../../utils/verifyWebToken.js";
+import Req from "../../../utils/Req.js";
 
 const loginCheck = catchAsyncError(async (req, res, next) => {
-  const { token } = req.cookies;
+  const { token } = Req(req);
 
   if (!token) {
     return next(
@@ -26,6 +27,11 @@ const loginCheck = catchAsyncError(async (req, res, next) => {
 
   res.status(200).json({
     message: "User is present",
+    id: findUser._id,
+    name: findUser.name,
+    photo: findUser.photo,
+    email: findUser.email,
+    role: findUser.role,
   });
 });
 

@@ -2,6 +2,12 @@ const globalErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 400;
   err.status = err.status || "Error";
 
+  if (err.name === "TokenError") {
+    err.statusCode = 40;
+    err.status = "unAuthorized";
+    err.message = "Sorry, your OAuth token has expired";
+  }
+
   if (err.name === "TokenExpiredError") {
     err.statusCode = 401;
     err.status = "unAuthorized";
@@ -11,16 +17,7 @@ const globalErrorHandler = (err, req, res, next) => {
   if (err.name === "ValidationError") {
     err.statusCode = 401;
     err.status = "Error";
-    err.message = "";
-
-    Object.keys(err.errors).forEach((key) => {
-      const value = err.errors[key];
-      console.log(err.errors);
-
-      err.message += value.message + ", ";
-    });
-
-    err.message = err.message.split(",").slice(0, -1).join(",");
+    err.message = `Validation Error : ${err.message}`;
   }
 
   if (err.code === 11000) {
@@ -58,6 +55,7 @@ const globalErrorHandler = (err, req, res, next) => {
   }
 
   if (err.name === "InternalOAuthError") {
+    return;
     err.statusCode = 403;
     err.status = "Login Error";
     err.message = "Error in Login. Please login again...";
