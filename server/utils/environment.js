@@ -13,4 +13,7 @@ export const environment = {
   FACEBOOK_APP_SECRET: process.env.FACEBOOK_OAUTH_APP_SECRET,
   JWT_SECRET_KEY: process.env.JWT_SECRET_KEY,
   JWT_EXPIRES_IN: Number(process.env.JWT_EXPIRES_IN),
+  MY_GMAIL_PASSWORD: process.env.MY_GMAIL_PASSWORD,
+  MY_GMAIL_ID: process.env.MY_GMAIL_ID,
+  STRING_CHARACTERS: process.env.STRING_CHARACTERS,
 };

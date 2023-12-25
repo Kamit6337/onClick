@@ -9,8 +9,12 @@ import {
 import signup from "../controllers/auth/custom/signup.js";
 import loginCheck from "../controllers/auth/custom/loginCheck.js";
 import login from "../controllers/auth/custom/login.js";
+import forgotPassword from "../controllers/auth/custom/forgotPassword.js";
 
 const router = express.Router();
+
+// NOTE: FORGOT PASSWORD
+router.post("/forgot", forgotPassword);
 
 // NOTE: CONTINUOUS CHECK LOGIN
 router.get("/login/check", loginCheck);

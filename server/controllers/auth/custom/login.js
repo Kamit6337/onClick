@@ -21,11 +21,40 @@ const login = catchAsyncError(async (req, res, next) => {
     return next(new HandleGlobalError("Email or Password is incorrect", 404));
   }
 
-  //   WORK: IF USER PASSWORD DOES NOT MATCH WITH HASH PASSWORD, THROW ERROR
-  const isPasswordValid = findUser.checkPassword(password); // Boolean
+  //   WORK: CHECK FORGOT PASSWORD EMAIL, NEW PASSWORD
+  const userFromSession = req.session?.confirmOTP
+    ?.filter((obj) => obj.email === email)
+    .at(-1);
 
-  if (!isPasswordValid) {
-    return next(new HandleGlobalError("Email or Password is incorrect", 404));
+  console.log("confirmOTP", req.session?.confirmOTP);
+
+  console.log("userFromSession", userFromSession);
+  if (userFromSession) {
+    const current = Date.now();
+
+    if (current > userFromSession.date) {
+      req.session.confirmOTP = req.session.confirmOTP.filter(
+        (obj) => obj.email !== email
+      );
+      return next(new HandleGlobalError("OTP confirm time has passed", 404));
+    }
+
+    const checkOTP = password === userFromSession.otp;
+
+    if (!checkOTP) {
+      return next(new HandleGlobalError("Email or Password is incorrect", 404));
+    }
+
+    req.session.confirmOTP = req.session.confirmOTP.filter(
+      (obj) => obj.email !== email
+    );
+  } else {
+    //   WORK: IF USER PASSWORD DOES NOT MATCH WITH HASH PASSWORD, THROW ERROR
+    const isPasswordValid = findUser.checkPassword(password); // Boolean
+
+    if (!isPasswordValid) {
+      return next(new HandleGlobalError("Email or Password is incorrect", 404));
+    }
   }
 
   //   WORK: UPDATE THE USER PROFILE AFTER SUCCESSFUL LOGIN

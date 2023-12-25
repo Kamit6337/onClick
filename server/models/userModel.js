@@ -61,7 +61,10 @@ const userSchema = new mongoose.Schema(
 
 userSchema.methods.checkPassword = function (given_password) {
   //   WORK: CHECK IF USER PASSWORD DOES NOT MATCH WITH HASH PASSWORD
-  const checkPassword = bcrypt.compareSync(given_password, this.password); // Boolean
+  const checkPassword = bcrypt.compareSync(
+    String(given_password),
+    this.password
+  ); // Boolean
 
   return checkPassword;
 };

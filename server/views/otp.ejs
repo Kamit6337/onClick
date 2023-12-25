@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>OTP Email Template</title>
+  </head>
+  <body
+    style="
+      font-family: 'Arial', sans-serif;
+      background-color: hsl(240, 79%, 85%);
+    "
+  >
+    <h1 style="color: #333">Your OTP is: <%= otp %></h1>
+    <p>Use this OTP to verify your account.</p>
+    <button onclick="copyToClipboard()">Copy OTP</button>
+
+    <script>
+      function copyToClipboard() {
+        var otpText = "<%= otp %>";
+        var textarea = document.createElement("textarea");
+        textarea.value = otpText;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+        alert("OTP copied to clipboard!");
+      }
+    </script>
+  </body>
+</html>

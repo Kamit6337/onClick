@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getReq } from "../utils/api/api";
+import { getReq } from "../../utils/api/api";
 
 const UseAllUser = (isSuccess = false) => {
   const allUser = useQuery({

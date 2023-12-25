@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { getAuthReq } from "../utils/api/authApi";
+import { getAuthReq } from "../../utils/api/authApi";
 
 const UseContinuousCheck = (loggedIn = false) => {
   const query = useQuery({

@@ -9,7 +9,7 @@
   }
 
   body {
-    @apply font-sans bg-white text-black950 cursor-default;
+    @apply font-sans bg-color_1 text-color_4 cursor-default;
   }
 
   button,

@@ -59,34 +59,34 @@
 
 /* WORK: CHANGE BACKGROUND COLOR OF TRACK */
 ::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Track color */
+  background: #112d4e; /* Track color */
 }
 *::-webkit-scrollbar-track {
-  background: #f1f1f1; /* Track color */
+  background: #112d4e; /* Track color */
 }
 
 /* WORK: CHANGE COLOR OF SCROLLBAR */
 ::-webkit-scrollbar-thumb {
-  background: hsl(0, 3%, 75%); /* Thumb color */
+  background: #f9f7f7; /* Thumb color */
   border-radius: 6px; /* Roundness of the thumb */
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: #888 #f1f1f1;
+  scrollbar-color: #f9f7f7;
 }
 
 *::-webkit-scrollbar-thumb {
-  background: hsl(0, 3%, 75%); /* Thumb color */
+  background: #f9f7f7; /* Thumb color */
   border-radius: 16px; /* Roundness of the thumb */
 }
 /* WORK: CHANGE COLOR OF SCROLLBAR ON HOVER */
 ::-webkit-scrollbar-thumb:hover {
-  background: #555; /* Thumb color on hover */
+  background: #dbe2efc9; /* Thumb color on hover */
 }
 
 *::-webkit-scrollbar-thumb:hover {
-  background: hsla(0, 2%, 39%, 0.63); /* Thumb color on hover */
+  background: #dbe2efc9; /* Thumb color on hover */
 }
 
 * {

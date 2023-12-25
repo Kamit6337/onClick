@@ -7,9 +7,10 @@ export default {
         sans: ["Poppins", "sans-serif"],
       },
       colors: {
-        black950: "#020617",
-        black900: "#0f172a",
-        grap50: "#f9fafb",
+        color_1: "#112D4E",
+        color_2: "#3F72AF",
+        color_3: "#DBE2EF",
+        color_4: "#F9F7F7",
       },
     },
     screens: {

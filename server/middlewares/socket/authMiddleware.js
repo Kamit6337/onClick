@@ -16,12 +16,15 @@ const authMiddleware = async (socket, next) => {
 
   try {
     const decoded = verifyWebToken(token);
-    const findUser = await User.findOne({ _id: decoded.id });
+    const findUser = await User.findOne({ _id: decoded.id }).select(
+      "_id name email photo"
+    );
 
     if (!findUser) {
       return next(err);
     }
 
+    socket.user = findUser;
     socket.userId = String(findUser._id);
     socket.userName = findUser.name;
 

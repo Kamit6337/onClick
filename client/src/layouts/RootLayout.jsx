@@ -2,9 +2,9 @@ import { Outlet, useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import isUserLoggedIn from "../utils/crypto/isUserLoggedIn";
 import removeCookies from "../utils/crypto/removeCookies";
-import UseContinuousCheck from "../hooks/UseContinuousCheck";
-import UseAllUser from "../hooks/UseAllUser";
-import UseUserRooms from "../hooks/UseUserRooms";
+import UseContinuousCheck from "../hooks/query/UseContinuousCheck";
+import UseAllUser from "../hooks/query/UseAllUser";
+import UseUserRooms from "../hooks/query/UseUserRooms";
 import Loading from "../components/Loading";
 
 const RootLayout = () => {

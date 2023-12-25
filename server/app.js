@@ -12,13 +12,13 @@ import chatRouter from "./routes/chatRoutes.js";
 import { environment } from "./utils/environment.js";
 import authMiddleware from "./middlewares/socket/authMiddleware.js";
 import protectRoute from "./middlewares/protectUserRoutes.js";
+import { Chat } from "./models/chatModel.js";
 
 const app = express();
 
 const httpServer = createServer(app);
 
 const io = new Server(httpServer, {
-  pingTimeout: 60000,
   cors: {
     credentials: true,
     origin:
@@ -59,9 +59,10 @@ io.on("connection", (socket) => {
     callback({ status: "ok" });
   });
 
-  socket.on("chat", (arg, callback) => {
+  socket.on("chat", async (arg, callback) => {
     const userId = socket.userId;
     const userName = socket.userName;
+    const user = socket.user;
 
     const { room, message } = arg;
 
@@ -69,9 +70,23 @@ io.on("connection", (socket) => {
       message,
       name: userName,
       sender: userId,
+      room,
     };
 
-    io.to(room).emit("chatMsg", res, (err) => {
+    const createChat = await Chat.create({
+      room,
+      message,
+      sender: userId,
+    });
+
+    if (!createChat) {
+      console.log("Error in chat creation");
+      return;
+    }
+
+    createChat.sender = user;
+
+    io.to(room).emit("chatMsg", createChat, (err) => {
       if (err) {
         console.log(err);
       }

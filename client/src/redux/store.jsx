@@ -1,9 +1,9 @@
-import { configureStore } from "@reduxjs/toolkit";
+// import { configureStore } from "@reduxjs/toolkit";
 
-export const store = configureStore({
-  reducer: {},
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: false, // Disable strict mode
-    }),
-});
+// export const store = configureStore({
+//   reducer: {},
+//   middleware: (getDefaultMiddleware) =>
+//     getDefaultMiddleware({
+//       serializableCheck: false, // Disable strict mode
+//     }),
+// });

@@ -14,6 +14,7 @@ const globalMiddlewares = () => {
 
   app.use(cors(corsOptions));
 
+  // app.set("view engine", "ejs");
   // Serve static files from the public folder
   //   app.use(express.static(path.join(__dirname, "public")));
   app.use(express.static("public"));
