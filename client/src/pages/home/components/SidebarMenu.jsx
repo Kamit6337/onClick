@@ -1,8 +1,30 @@
+import { useEffect } from "react";
 import UseUserRooms from "../../../hooks/query/UseUserRooms";
+import UseSocket from "../../../hooks/socket/UseSocket";
+import UseContinuousCheck from "../../../hooks/query/UseContinuousCheck";
 
 /* eslint-disable react/prop-types */
 const SidebarMenu = ({ activeRoom, showRoomChats }) => {
-  const { data } = UseUserRooms(true);
+  const { data, refetch } = UseUserRooms(true);
+  const { socket, on, off } = UseSocket();
+  const { data: user } = UseContinuousCheck(true);
+
+  useEffect(() => {
+    const roomArg = (arg) => {
+      const { members } = arg;
+
+      if (members?.includes(user.id)) {
+        refetch();
+      }
+    };
+
+    on("singleRoomCreated", roomArg);
+
+    return () => {
+      // Cleanup: Remove the listener when the component unmounts
+      off("singleRoomCreated", roomArg);
+    };
+  }, [socket, on, off, refetch, user]);
 
   return (
     <div className="w-72 h-full border-r border-color_2">
@@ -21,6 +43,7 @@ const SidebarMenu = ({ activeRoom, showRoomChats }) => {
               <img
                 src={members[0].photo}
                 alt="profile"
+                loading="lazy"
                 className="w-10 h-10 rounded-full"
               />
               <div>

@@ -13,6 +13,7 @@ import { environment } from "./utils/environment.js";
 import authMiddleware from "./middlewares/socket/authMiddleware.js";
 import protectRoute from "./middlewares/protectUserRoutes.js";
 import { Chat } from "./models/chatModel.js";
+import { Room } from "./models/roomModel.js";
 
 const app = express();
 
@@ -59,19 +60,45 @@ io.on("connection", (socket) => {
     callback({ status: "ok" });
   });
 
+  // WORK: CREATE SINGLE ROOM
+  socket.on("createSingleRoom", async (arg, callback) => {
+    const userId = socket.userId;
+    const { id } = arg;
+
+    if (!id || id === userId) {
+      console.log("Not provide the Id");
+      return;
+    }
+    const members = [id, userId];
+
+    const findRoom = await Room.findOne({ members });
+
+    if (findRoom) {
+      console.log("Room is already present");
+      return;
+    }
+
+    let room = await Room.create({
+      members,
+    });
+
+    if (!room) {
+      console.log("Issue in room creation");
+      return;
+    }
+
+    io.emit("singleRoomCreated", { members });
+
+    callback({ status: "ok" });
+  });
+
+  // WORK: CHAT MESSAGE SOCKET
   socket.on("chat", async (arg, callback) => {
     const userId = socket.userId;
     const userName = socket.userName;
     const user = socket.user;
 
     const { room, message } = arg;
-
-    const res = {
-      message,
-      name: userName,
-      sender: userId,
-      room,
-    };
 
     const createChat = await Chat.create({
       room,

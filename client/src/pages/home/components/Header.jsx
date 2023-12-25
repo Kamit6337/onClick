@@ -3,23 +3,22 @@ import { useEffect, useRef, useState } from "react";
 import UseContinuousCheck from "../../../hooks/query/UseContinuousCheck";
 import { useForm } from "react-hook-form";
 import UseAllUser from "../../../hooks/query/UseAllUser";
-import UseSingleRoomCreation from "../../../hooks/mutation/UseSingleRoomCreation";
-import UseUserRooms from "../../../hooks/query/UseUserRooms";
+import UseSocket from "../../../hooks/socket/UseSocket";
 
 const Header = () => {
   const divRef = useRef(null);
   const { data: user } = UseContinuousCheck(true);
   const { data: users } = UseAllUser(true);
   const [searchUsers, setSearchUsers] = useState([]);
-  const { refetch } = UseUserRooms(true);
+  const { emit } = UseSocket();
 
-  const { mutate, isSuccess } = UseSingleRoomCreation();
+  // const { mutate, isSuccess } = UseSingleRoomCreation();
 
-  useEffect(() => {
-    if (isSuccess) {
-      refetch();
-    }
-  }, [isSuccess, refetch]);
+  // useEffect(() => {
+  //   if (isSuccess) {
+  //     refetch();
+  //   }
+  // }, [isSuccess, refetch]);
 
   const { register, reset } = useForm({
     defaultValues: {
@@ -60,7 +59,10 @@ const Header = () => {
 
   const createRoom = (id) => {
     setSearchUsers([]);
-    mutate(id);
+    emit("createSingleRoom", { id }, (err) => {
+      console.log("createRoom", err);
+    });
+    // mutate(id);
   };
 
   return (
@@ -116,7 +118,12 @@ const Header = () => {
 
       {/* WORK: PROFILE DIV */}
       <div className="flex items-center gap-2 pr-10 cursor-pointer">
-        <img src={user?.photo} alt="profile" className="w-8 h-8 rounded-full" />
+        <img
+          src={user?.photo}
+          alt="profile"
+          loading="lazy"
+          className="w-8 h-8 rounded-full"
+        />
         <p>{user?.name.split(" ")[0]}</p>
       </div>
     </header>

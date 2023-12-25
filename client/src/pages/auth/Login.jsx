@@ -86,17 +86,17 @@ const Login = () => {
 
       {/* NOTE: THE CENTER PAGE */}
 
-      <div className="h-[500px] w-[700px] border border-gray-600 rounded-xl flex justify-center ">
+      <div className="h-[500px] w-[700px] border border-color_3 rounded-xl flex justify-center ">
         {/* WORK: THE OAUTH */}
         <div className="flex-1 flex flex-col gap-4 justify-center items-center p-6">
           <div
-            className="border border-slate-500 rounded-lg p-3 w-full cursor-pointer bg-red-200 font-semibold  tracking-wide"
+            className="border  rounded-lg p-3 w-full cursor-pointer bg-red-500 font-semibold  tracking-wide"
             onClick={googleOAuth}
           >
             Login in Google
           </div>
           <div
-            className="border border-slate-500 rounded-lg p-3 w-full mb-20 cursor-pointer bg-blue-200 font-semibold  tracking-wide"
+            className="border  rounded-lg p-3 w-full mb-20 cursor-pointer bg-blue-500 font-semibold  tracking-wide"
             onClick={facebookOAuth}
           >
             Login in Facebook
@@ -104,14 +104,14 @@ const Login = () => {
         </div>
         {/* WORK: BORDER / MARGIN*/}
 
-        <div className="h-full w-[1px] bg-gray-300" />
+        <div className="h-full w-[1px] bg-color_3" />
 
         {/* WORK: FORM AND GO TO LOGIN BUTTON*/}
         <div className="flex-1 flex flex-col justify-center items-center  p-6">
           {/* WORK: SIGNUP FORM*/}
           <form
             onSubmit={handleSubmit(onSubmit)}
-            className="grid grid-rows-3 gap-2 w-full"
+            className="flex flex-col gap-1 w-full text-color_1"
           >
             {/* WORK: EMAIL FIELD*/}
 
@@ -138,7 +138,7 @@ const Login = () => {
 
             {/* WORK: PASSWORD FIELD*/}
             <div>
-              <div className="flex justify-between items-center border border-slate-600 rounded-lg ">
+              <div className="flex justify-between items-center border  rounded-lg ">
                 <input
                   type={togglePassword ? "text" : "password"}
                   {...register("password", { required: true })}
@@ -147,7 +147,7 @@ const Login = () => {
                 />
 
                 <p
-                  className="p-2"
+                  className="p-2 text-color_4 cursor-pointer"
                   onClick={() => setTogglePassword((prev) => !prev)}
                 >
                   {togglePassword ? "Hide" : "Show"}
@@ -160,17 +160,16 @@ const Login = () => {
             </div>
 
             {/* WORK: SUBMIT BUTTON*/}
-            <div>
-              <input
-                type="submit"
-                className="border border-slate-600 p-3 rounded-lg bg-purple-300 font-semibold text-lg tracking-wide cursor-pointer w-full"
-              />
-            </div>
+
+            <input
+              type="submit"
+              className="border p-3 py-2 mt-8 rounded-lg bg-purple-300 font-semibold text-lg tracking-wide cursor-pointer w-full"
+            />
           </form>
 
           {/* WORK: GO TO LOGIN PAGE*/}
 
-          <p className="self-start">
+          <p className="self-start mt-4 self-end">
             <Link to={`/signup`}>Go to Sign Up</Link>
           </p>
         </div>

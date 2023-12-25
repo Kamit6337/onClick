@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import UseContinuousCheck from "../../../hooks/query/UseContinuousCheck";
 import changeDate from "../../../utils/javaScript/changeDate";
 import UseSocket from "../../../hooks/socket/UseSocket";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import UseRoomChats from "../../../hooks/query/UseRoomChats";
 import Loading from "../../../components/Loading";
 
@@ -11,8 +11,6 @@ const ChatRoom = ({ activeRoom, list }) => {
   const { data: user } = UseContinuousCheck(true);
   const { socket, emit, on, off } = UseSocket();
   const divRef = useRef(null);
-
-  console.log("Active Room", activeRoom);
 
   const { isLoading, isError, error, data } = UseRoomChats({
     toggle: false,
@@ -23,9 +21,7 @@ const ChatRoom = ({ activeRoom, list }) => {
   const [messageList, setMessageList] = useState([]);
 
   useEffect(() => {
-    if (list) {
-      setMessageList(list);
-    }
+    setMessageList(list || []);
   }, [list]);
 
   useEffect(() => {
@@ -34,16 +30,29 @@ const ChatRoom = ({ activeRoom, list }) => {
     }
   }, [data]);
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (divRef.current) {
+  //     setTimeout(() => {
+  //       // divRef.current.scrollTop = divRef.current.scrollHeight;
+  //       const divHeight = divRef.current.scrollHeight;
+
+  //       requestAnimationFrame(() => {
+  //         divRef.current.scrollTop = divHeight;
+  //       });
+  //     }, 1000);
+  //   }
+  // }, [activeRoom]);
+
+  useLayoutEffect(() => {
     if (divRef.current) {
-      // divRef.current.scrollTop = divRef.current.scrollHeight;
       const divHeight = divRef.current.scrollHeight;
 
-      requestAnimationFrame(() => {
-        divRef.current.scrollTop = divHeight;
+      divRef.current.scrollTo({
+        top: divHeight,
+        behavior: "auto", // Use "auto" for instant move
       });
     }
-  }, [activeRoom]);
+  }, [messageList]);
 
   useEffect(() => {
     const chatArg = (arg) => {
@@ -87,19 +96,21 @@ const ChatRoom = ({ activeRoom, list }) => {
   const sendChat = (roomId) => {
     const { inputChat } = getValues();
 
-    const res = {
-      message: inputChat,
-      room: roomId,
-    };
+    if (inputChat) {
+      const res = {
+        message: inputChat,
+        room: roomId,
+      };
 
-    if (socket) {
-      emit("chat", res, (err) => {
-        if (err) {
-          console.log(err);
-        }
-      });
+      if (socket) {
+        emit("chat", res, (err) => {
+          if (err) {
+            console.log(err);
+          }
+        });
+      }
+      reset({ inputChat: "" });
     }
-    reset({ inputChat: "" });
   };
 
   const sendChatFromInput = (e, roomId) => {
@@ -142,22 +153,21 @@ const ChatRoom = ({ activeRoom, list }) => {
                         <p className="text-xs mb-1">{changeDate(updatedAt)}</p>
 
                         <p className="text-sm"></p>
-                        <div className="p-2 px-4 border border-color_3 text-color_1 bg-color_3 rounded-2xl ">
-                          <p className="font-extrabold tracking-wide text-color_1">
+                        <div className="p-2 px-4 border border-color_3 text-color_1 bg-color_3 rounded-2xl max-w-96 ">
+                          <p className="font-extrabold tracking-wide text-color_1 ">
                             {name.split(" ")[0]}
                           </p>
-                          <p>{message}</p>
+                          <p className="break-all font-thin">{message}</p>
                         </div>
                       </div>
                     ) : (
                       <div key={i} className={`flex items-end gap-1 w-max `}>
-                        <div className="p-2 px-4 border border-color_3 rounded-2xl">
+                        <div className="p-2 px-4 border border-color_3 rounded-2xl max-w-96">
                           <p className="font-extrabold tracking-wide text-color_3 ">
                             {name.split(" ")[0]}
                           </p>
-                          <p className="font-thin text-sm">{message}</p>
+                          <p className="font-thin break-all">{message}</p>
                         </div>
-                        <p className="text-sm">{}</p>
                         <p className="text-xs mb-1">{changeDate(updatedAt)}</p>
                       </div>
                     )}
@@ -170,7 +180,7 @@ const ChatRoom = ({ activeRoom, list }) => {
           </div>
 
           {/* WORK: INPUT CHAT BOX */}
-          <div className="absolute z-10 w-full bottom-0 border-t border-color_2 py-2 px-6 pr-10 h-14 flex justify-between gap-8 items-center">
+          <div className="absolute z-10 w-full bottom-0 border-t border-color_2 py-2 px-4 pr-10 h-14 flex justify-between gap-4 items-center">
             <div className="w-full">
               <input
                 type="text"
@@ -182,12 +192,13 @@ const ChatRoom = ({ activeRoom, list }) => {
                 autoComplete="off"
                 onKeyDown={(e) => sendChatFromInput(e, activeRoom)}
                 placeholder="Chat Message"
-                className="text-color_1  border border-color_2 rounded-3xl p-1 pl-4 w-full"
+                className="text-color_1  border border-color_2 rounded-3xl p-1 px-6 w-full"
               />
             </div>
             <div
+              // disabled={!getValues("inputChat")}
               onClick={() => sendChat(activeRoom)}
-              className="cursor-pointer"
+              className="cursor-pointer bg-color_1 text-color_4 border px-5 py-1 rounded-3xl"
             >
               Send
             </div>

@@ -10,7 +10,7 @@ const Home = () => {
   const [activeRoom, setActiveRoom] = useState(null);
   const { data } = UseUserRooms(true);
   const { socket, on, off } = UseSocket();
-  const [rooms, setRooms] = useState(data?.rooms || []);
+  const [rooms, setRooms] = useState(data?.rooms);
   const [list, setList] = useState(null);
 
   useEffect(() => {
@@ -42,9 +42,12 @@ const Home = () => {
   }, [socket, on, off]);
 
   const showRoomChats = (roomId) => {
+    console.log("active room", roomId);
+    console.log("rooms", rooms);
+    const findRoom = rooms?.find((room) => room.id === roomId);
+    setList(findRoom?.chats);
     setActiveRoom(roomId);
-    const findRooms = rooms?.find((id) => id === roomId);
-    setList(findRooms?.chats);
+    console.log("list", findRoom);
   };
 
   return (
@@ -56,7 +59,7 @@ const Home = () => {
 
         {/* WORK: CHAT MESSAGES */}
         <ErrorBoundary fallback={<div>Something went wrong</div>}>
-          <ChatRoom activeRoom={activeRoom} list={list} />
+          <ChatRoom activeRoom={activeRoom} list={list} key={1} />
         </ErrorBoundary>
       </main>
     </section>
