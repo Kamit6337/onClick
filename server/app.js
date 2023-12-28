@@ -34,7 +34,7 @@ app.use(globalMiddlewares());
 app.use("/auth", authRouter);
 app.use("/user", protectRoute, userRouter);
 app.use("/room", protectRoute, roomRouter);
-app.use("/chat", chatRouter);
+app.use("/chat", protectRoute, chatRouter);
 
 // NOTE: SOCKET.IO MIDDLEWARES
 io.use(authMiddleware);

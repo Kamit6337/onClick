@@ -3,6 +3,7 @@ import HandleGlobalError from "../../utils/HandleGlobalError.js";
 import catchAsyncError from "../../utils/catchAsyncError.js";
 import generateWebToken from "../../utils/generateWebToken.js";
 import { User } from "../../models/userModel.js";
+import Req from "../../utils/Req.js";
 
 // NOTE: UPDATE USER
 export const updateUser = catchAsyncError(async (req, res) => {
@@ -96,9 +97,16 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
 
 // NOTE: LOGOUT
 export const logout = (req, res) => {
-  req.logout();
+  const cookies = Req(req);
 
-  const cookies = req.cookies;
+  // const { token } = req.cookies;
+  // const cookies = req.cookies;
+  // req.logout((err) => {
+  //   if (err) {
+  //     return res.status(500).json({
+  //       message: "Error during logout",
+  //     });
+  //   }
 
   Object.keys(cookies).forEach((cookie) => {
     res.clearCookie(cookie);

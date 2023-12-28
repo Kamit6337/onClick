@@ -5,6 +5,7 @@ import UseSocket from "../../../hooks/socket/UseSocket";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import UseRoomChats from "../../../hooks/query/UseRoomChats";
 import Loading from "../../../components/Loading";
+import ChatMediaMessage from "../../../components/material_UI/ChatMediaMessage";
 
 /* eslint-disable react/prop-types */
 const ChatRoom = ({ activeRoom, list }) => {
@@ -181,6 +182,9 @@ const ChatRoom = ({ activeRoom, list }) => {
 
           {/* WORK: INPUT CHAT BOX */}
           <div className="absolute z-10 w-full bottom-0 border-t border-color_2 py-2 px-4 pr-10 h-14 flex justify-between gap-4 items-center">
+            <div>
+              <ChatMediaMessage />
+            </div>
             <div className="w-full">
               <input
                 type="text"

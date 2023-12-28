@@ -54,7 +54,7 @@ const SidebarMenu = ({ activeRoom, showRoomChats }) => {
           );
         })
       ) : (
-        <div>Sorry, no chat available</div>
+        <div className="text-center my-auto">Sorry, no chat available</div>
       )}
     </div>
   );
