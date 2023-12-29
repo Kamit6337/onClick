@@ -17,7 +17,19 @@ const Home = () => {
     const chatArg = (arg) => {
       const { room } = arg;
 
-      console.log("message", arg);
+      setRooms((prev) => {
+        prev = prev.map((rum) => {
+          if (rum.id === room) {
+            rum.chats = [...rum.chats, arg];
+          }
+          return rum;
+        });
+
+        return prev;
+      });
+    };
+    const imageArg = (arg) => {
+      const { room } = arg;
 
       setRooms((prev) => {
         prev = prev.map((rum) => {
@@ -31,23 +43,20 @@ const Home = () => {
       });
     };
 
-    if (socket) {
-      on("chatMsg", chatArg);
-    }
+    on("chatMsg", chatArg);
+    on("image", imageArg);
 
     return () => {
       // Cleanup: Remove the listener when the component unmounts
       off("chatMsg", chatArg);
+      off("image", imageArg);
     };
   }, [socket, on, off]);
 
   const showRoomChats = (roomId) => {
-    console.log("active room", roomId);
-    console.log("rooms", rooms);
     const findRoom = rooms?.find((room) => room.id === roomId);
     setList(findRoom?.chats);
     setActiveRoom(roomId);
-    console.log("list", findRoom);
   };
 
   return (

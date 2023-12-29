@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
 import { Icons } from "../assets/icons";
 import UseContinuousCheck from "../hooks/query/UseContinuousCheck";
@@ -12,7 +13,7 @@ import OpenFileExplorer from "../lib/OpenFileExplorer";
 import UseUpdateUser from "../hooks/mutation/UseUpdateUser";
 import MakeItLarge from "../lib/MakeItLarge";
 import OnClickOutside from "../lib/onClickOutside";
-/* eslint-disable react/prop-types */
+
 const UserProfile = ({ toggle = false, undoToggle }) => {
   const { data: user, refetch } = UseContinuousCheck(true);
   const navigate = useNavigate();

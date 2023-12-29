@@ -1,16 +1,20 @@
 import express from "express";
-import cookieParser from "cookie-parser";
 import bodyParser from "body-parser";
 import cors from "cors";
 import passport from "passport";
-import cookieSession from "cookie-session";
-import { cookieSessionOptions } from "../utils/cookieSessionOptions.js";
 import { corsOptions } from "../utils/corsOptions.js";
 import session from "express-session";
 import expressSessionOptions from "../utils/expressSessionOptions.js";
+import checkDatabaseConnection from "./checkDatabaseConnection.js";
+import compression from "compression";
 
 const globalMiddlewares = () => {
   const app = express();
+
+  app.use(checkDatabaseConnection);
+
+  // The middleware will attempt to compress response bodies for all request that traverse through the middleware
+  app.use(compression());
 
   app.use(cors(corsOptions));
 

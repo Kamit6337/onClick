@@ -18,6 +18,10 @@ const roomSchema = new mongoose.Schema(
       ref: "User",
       default: null,
     },
+    isGroupChat: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

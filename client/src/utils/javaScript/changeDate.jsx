@@ -49,6 +49,12 @@ const changeDate = (UTCDate, ago = false, fullMonth = false) => {
   const currentMinute = now.getMinutes();
   const currentSeconds = now.getSeconds();
 
+  if (!UTCDate) {
+    return `${currentDate} ${
+      shortMonthsList[convertToNum(currentMonth)]
+    }, ${currentYear} - ${currentHour}:${currentMinute}`;
+  }
+
   if (!ago) {
     if (!fullMonth) {
       return `${day} ${
