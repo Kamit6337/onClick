@@ -11,25 +11,29 @@ const createSingleRoom = (io, socket) => {
     }
     const members = [id, userId];
 
-    const findRoom = await Room.findOne({ members });
+    try {
+      const findRoom = await Room.findOne({ members });
 
-    if (findRoom) {
-      console.log("Room is already present");
-      return;
+      if (findRoom) {
+        console.log("Room is already present");
+        return;
+      }
+
+      await Room.create({
+        members,
+      });
+
+      // if (!room) {
+      //   console.log("Issue in room creation");
+      //   return;
+      // }
+
+      io.emit("singleRoomCreated", { members });
+
+      callback({ status: "ok" });
+    } catch (error) {
+      callback({ error: error.message });
     }
-
-    let room = await Room.create({
-      members,
-    });
-
-    if (!room) {
-      console.log("Issue in room creation");
-      return;
-    }
-
-    io.emit("singleRoomCreated", { members });
-
-    callback({ status: "ok" });
   });
 };
 

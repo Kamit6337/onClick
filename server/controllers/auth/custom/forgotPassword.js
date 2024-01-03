@@ -4,6 +4,8 @@ import ejs from "ejs";
 import path from "path";
 import { environment } from "../../../utils/environment.js";
 import generateString from "../../../utils/javaScript/generateString.js";
+import { User } from "../../../models/userModel.js";
+import HandleGlobalError from "../../../utils/HandleGlobalError.js";
 
 // Set up nodemailer transporter
 const transporter = nodemailer.createTransport({
@@ -16,6 +18,16 @@ const transporter = nodemailer.createTransport({
 
 const forgotPassword = catchAsyncError(async (req, res, next) => {
   const { email } = req.body;
+
+  if (!email) {
+    return next(new HandleGlobalError("Email is not provided", 404));
+  }
+
+  const findUser = await User.findOne({ email });
+
+  if (!findUser) {
+    return next(new HandleGlobalError("You are not our customer", 403));
+  }
 
   // Generate OTP (you can replace this with your OTP generation logic)
   const otp = generateString();

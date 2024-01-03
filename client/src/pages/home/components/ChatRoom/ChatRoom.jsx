@@ -1,32 +1,38 @@
 /* eslint-disable react/prop-types */
 import { useForm } from "react-hook-form";
-import UseContinuousCheck from "../../../hooks/query/UseContinuousCheck";
-import changeDate from "../../../utils/javaScript/changeDate";
-import UseSocket from "../../../hooks/socket/UseSocket";
+import UseContinuousCheck from "../../../../hooks/query/UseContinuousCheck";
+import changeDate from "../../../../utils/javaScript/changeDate";
+import UseSocket from "../../../../hooks/socket/UseSocket";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import UseRoomChats from "../../../hooks/query/UseRoomChats";
-import Loading from "../../../components/Loading";
-import ChatMediaMessage from "../../../components/material_UI/ChatMediaMessage";
-import environment from "../../../utils/environment";
+import Loading from "../../../../components/Loading";
+import ChatMediaMessage from "./components/ChatMediaMessage";
+import environment from "../../../../utils/environment";
+import { useSelector } from "react-redux";
+import { roomsState } from "../../../../redux/slice/roomSlice";
+import UseRoomChat from "../../../../hooks/query/UseRoomChat";
+import ChatRoomHeader from "./components/ChatRoomHeader";
 
 const SERVER_URL = environment.SERVER_URL;
 
-const ChatRoom = ({ activeRoom, list }) => {
+const ChatRoom = () => {
   const { data: user } = UseContinuousCheck(true);
-  const { socket, emit, on, off } = UseSocket();
+  const { emit } = UseSocket();
   const divRef = useRef(null);
+  const { activeRoom, activeRoomChats } = useSelector(roomsState);
 
-  const { isLoading, isError, error, data } = UseRoomChats({
+  const [messageList, setMessageList] = useState([]);
+
+  const { isLoading, isError, error, data } = UseRoomChat({
     toggle: false,
     id: activeRoom,
     page: 1,
   });
 
-  const [messageList, setMessageList] = useState([]);
-
   useEffect(() => {
-    setMessageList(list || []);
-  }, [list]);
+    if (activeRoom) {
+      setMessageList(activeRoomChats);
+    }
+  }, [activeRoom, activeRoomChats]);
 
   useEffect(() => {
     if (data?.data) {
@@ -44,44 +50,6 @@ const ChatRoom = ({ activeRoom, list }) => {
       });
     }
   }, [messageList]);
-
-  useEffect(() => {
-    const chatArg = (arg) => {
-      const { room } = arg;
-      if (room === activeRoom) {
-        setMessageList((prev) => [...prev, arg]);
-      }
-    };
-
-    const imageArg = (arg) => {
-      const { room } = arg;
-      console.log("arg", arg);
-
-      if (room === activeRoom) {
-        setMessageList((prev) => [...prev, arg]);
-      }
-    };
-
-    on("chatMsg", chatArg);
-    on("image", imageArg);
-
-    return () => {
-      // Cleanup: Remove the listener when the component unmounts
-      off("chatMsg", chatArg);
-      off("image", imageArg);
-    };
-  }, [socket, on, off, activeRoom]);
-
-  // useEffect(() => {
-  //   if (divRef.current) {
-  //     const divHeight = divRef.current.scrollHeight;
-
-  //     divRef.current.scrollTo({
-  //       top: divHeight,
-  //       behavior: "smooth",
-  //     });
-  //   }
-  // }, [messageList]);
 
   const { register, getValues, reset } = useForm({
     defaultValues: {
@@ -101,14 +69,12 @@ const ChatRoom = ({ activeRoom, list }) => {
         message: inputChat,
         room: roomId,
       };
+      emit("chat", res, (err) => {
+        if (err) {
+          console.log(err);
+        }
+      });
 
-      if (socket) {
-        emit("chat", res, (err) => {
-          if (err) {
-            console.log(err);
-          }
-        });
-      }
       reset({ inputChat: "" });
     }
   };
@@ -121,7 +87,7 @@ const ChatRoom = ({ activeRoom, list }) => {
 
   if (!activeRoom) {
     return (
-      <div className="flex-1 h-full">
+      <div className="w-full h-full flex justify-center items-center text-xl font-semibold tracking-wider">
         <p>Please Select a chat </p>
       </div>
     );
@@ -129,24 +95,25 @@ const ChatRoom = ({ activeRoom, list }) => {
 
   if (isLoading) {
     return (
-      <div className="flex-1 h-full">
+      <div>
         <Loading />
       </div>
     );
   }
 
   return (
-    <div className="relative flex-1 h-full">
-      {/* WORK: CHAT MESSAGES AREA */}
+    <div className="w-full h-full">
+      {/* MARK: HEADER */}
+
+      <ChatRoomHeader />
+      {/* MARK: CHAT MESSAGES AREA */}
       <div
-        className=" overflow-y-scroll h-full p-6 flex flex-col gap-4"
+        className=" overflow-y-scroll p-6 flex flex-col gap-4"
         ref={divRef}
-        style={{ height: "calc(100% - 56px)" }}
+        style={{ height: "calc(100% - 112px)" }}
       >
         {messageList?.length > 0 ? (
           messageList.map((obj, i) => {
-            console.log("messga", obj);
-
             let {
               message,
               sender: { _id: id, name },
@@ -162,11 +129,9 @@ const ChatRoom = ({ activeRoom, list }) => {
                 return (
                   <div
                     key={i}
-                    className={`flex items-end gap-1 w-max  self-end `}
+                    className={`flex items-end gap-2 w-max  self-end `}
                   >
                     <p className="text-xs mb-1">{changeDate(updatedAt)}</p>
-
-                    <p className="text-sm"></p>
                     <div className="p-2 px-4 border border-color_3 text-color_1 bg-color_3 rounded-2xl max-w-96 ">
                       <p className="font-extrabold tracking-wide text-color_1 ">
                         {name.split(" ")[0]}
@@ -177,7 +142,7 @@ const ChatRoom = ({ activeRoom, list }) => {
                 );
               } else {
                 return (
-                  <div key={i} className={`flex items-end gap-1 w-max `}>
+                  <div key={i} className={`flex items-end gap-2 w-max `}>
                     <div className="p-2 px-4 border border-color_3 rounded-2xl max-w-96">
                       <p className="font-extrabold tracking-wide text-color_3 ">
                         {name.split(" ")[0]}
@@ -238,9 +203,9 @@ const ChatRoom = ({ activeRoom, list }) => {
         )}
       </div>
 
-      {/* WORK: INPUT CHAT BOX */}
-      <div className="absolute z-10 w-full bottom-0 border-t border-color_2 py-2 px-4 pr-10 h-14 flex justify-between gap-4 items-center">
-        <div>
+      {/* MARK: INPUT CHAT BOX */}
+      <div className="w-full top_box_shadow bottom-0 border-t border-color_2 py-2 px-4 pr-10 h-14 flex justify-between gap-4 items-center">
+        <div className="w-10 h-full">
           <ChatMediaMessage activeRoom={activeRoom} />
         </div>
         <div className="w-full">

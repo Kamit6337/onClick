@@ -1,18 +1,17 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import { Icons } from "../assets/icons";
-import UseContinuousCheck from "../hooks/query/UseContinuousCheck";
-import UseLogout from "../hooks/query/UseLogout";
-import { ToastContainer, toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+import { Icons } from "../../../../../assets/icons";
+import UseContinuousCheck from "../../../../../hooks/query/UseContinuousCheck";
+import UseLogout from "../../../../../hooks/query/UseLogout";
 import { useNavigate } from "react-router-dom";
-import Loading from "./Loading";
-import removeCookies from "../utils/crypto/removeCookies";
-import ModeEditIcon from "@mui/icons-material/ModeEdit";
-import OpenFileExplorer from "../lib/OpenFileExplorer";
-import UseUpdateUser from "../hooks/mutation/UseUpdateUser";
-import MakeItLarge from "../lib/MakeItLarge";
-import OnClickOutside from "../lib/onClickOutside";
+import Loading from "../../../../../components/Loading";
+import removeCookies from "../../../../../utils/crypto/removeCookies";
+import UseUpdateUser from "../../../../../hooks/mutation/UseUpdateUser";
+import MakeItLarge from "../../../../../lib/MakeItLarge";
+import OnClickOutside from "../../../../../lib/onClickOutside";
+import environment from "../../../../../utils/environment";
+import ImageComp from "../../../../../components/Image";
+import Toastify from "../../../../../lib/Toastify";
 
 const UserProfile = ({ toggle = false, undoToggle }) => {
   const { data: user, refetch } = UseContinuousCheck(true);
@@ -20,14 +19,7 @@ const UserProfile = ({ toggle = false, undoToggle }) => {
   const [doLogout, setDoLogout] = useState(false);
   const [makeLarge, setMakeLarge] = useState(false);
   const { isLoading, isError, error, data, isSuccess } = UseLogout(doLogout);
-  const {
-    ref,
-    handleFile,
-    isFile,
-    file,
-    error: fileExplorerError,
-    onClick,
-  } = OpenFileExplorer();
+  const { Image, file } = ImageComp();
 
   const {
     mutate,
@@ -42,25 +34,7 @@ const UserProfile = ({ toggle = false, undoToggle }) => {
 
   const { ref: refMakeLarge } = OnClickOutside(undoMakeLarge);
 
-  const showErrorMessage = ({ message }) => {
-    toast.error(message || "Somethings went Wrong !", {
-      position: toast.POSITION.TOP_RIGHT,
-    });
-  };
-  const showSuccessMessage = ({ message, time = 5000 }) => {
-    toast.success(message || "Somethings went Wrong !", {
-      position: toast.POSITION.TOP_RIGHT,
-      autoClose: time,
-    });
-  };
-
-  useEffect(() => {
-    if (fileExplorerError || updateUserError) {
-      showErrorMessage({
-        message: fileExplorerError || updateUserError.message,
-      });
-    }
-  }, [fileExplorerError, updateUserError]);
+  const { ToastContainer, showErrorMessage, showSuccessMessage } = Toastify();
 
   useEffect(() => {
     if (updateUserIsSuccess) {
@@ -69,19 +43,19 @@ const UserProfile = ({ toggle = false, undoToggle }) => {
   }, [updateUserIsSuccess, refetch]);
 
   useEffect(() => {
-    if (isFile) {
+    if (file) {
       const formData = new FormData();
       formData.append("image", file);
 
       mutate(formData);
     }
-  }, [isFile, file, mutate]);
+  }, [file, mutate]);
 
   useEffect(() => {
-    if (isError) {
-      showErrorMessage({ message: error.message });
+    if (isError || updateUserError) {
+      showErrorMessage({ message: error.message || updateUserError.message });
     }
-  }, [isError, error]);
+  }, [isError, error, updateUserError, showErrorMessage]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -93,7 +67,9 @@ const UserProfile = ({ toggle = false, undoToggle }) => {
         navigate("/");
       }, 2000);
     }
-  }, [isSuccess, data, navigate]);
+  }, [isSuccess, data, navigate, showSuccessMessage]);
+
+  const userPhoto = `${environment.SERVER_URL}/${user?.photo}`;
 
   return (
     <>
@@ -106,29 +82,23 @@ const UserProfile = ({ toggle = false, undoToggle }) => {
             </p> */}
               <div className="flex justify-evenly  items-center px-10 py-8 border-b border-color_4">
                 <div className="w-32 h-32 relative">
-                  <img
-                    src={user?.photo}
+                  <Image src={userPhoto} />
+                  {/* <img
+                    src={userPhoto}
+                    loading="lazy"
                     alt="profile"
                     className="w-full h-full rounded-full cursor-pointer"
                     onClick={() => setMakeLarge(true)}
                   />
+                  <div className="absolute bottom-0 right-0 z-10 bg-color_4 p-1 cursor-pointer rounded-full">
+                    <ModeEditIcon className="text-color_1" onClick={onClick} />
+                  </div> */}
+
                   {isPending && (
                     <div className="absolute top-0 border border-color_4 rounded-full w-full h-full backdrop-blur-sm z-10 ">
                       <Loading hScreen={false} small={true} />
                     </div>
                   )}
-
-                  <div className="absolute bottom-0 right-0 z-10 bg-color_4 p-1 cursor-pointer rounded-full">
-                    <ModeEditIcon className="text-color_1" onClick={onClick} />
-                    <input
-                      type="file"
-                      accept=".jpeg, .jpg, .png" // Specify accepted file types
-                      style={{ display: "none" }}
-                      ref={ref}
-                      onChange={handleFile}
-                    />
-                    ;
-                  </div>
                 </div>
                 <div className="flex flex-col gap-2">
                   <p>{user?.name}</p>
@@ -149,7 +119,7 @@ const UserProfile = ({ toggle = false, undoToggle }) => {
               {makeLarge && (
                 <MakeItLarge
                   hScreen={false}
-                  photo={user?.photo}
+                  photo={userPhoto}
                   radius={300}
                   forwardedRef={refMakeLarge}
                 />

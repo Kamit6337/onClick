@@ -6,6 +6,10 @@ const roomSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
+    photo: {
+      type: String,
+      default: null,
+    },
     members: [
       {
         type: mongoose.Schema.Types.ObjectId,

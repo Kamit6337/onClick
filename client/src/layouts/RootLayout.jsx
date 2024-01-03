@@ -6,6 +6,7 @@ import UseContinuousCheck from "../hooks/query/UseContinuousCheck";
 import UseAllUser from "../hooks/query/UseAllUser";
 import UseUserRooms from "../hooks/query/UseUserRooms";
 import Loading from "../components/Loading";
+import UseRoomChats from "../hooks/query/UseRoomChats";
 
 const RootLayout = () => {
   const navigate = useNavigate();
@@ -14,19 +15,41 @@ const RootLayout = () => {
   const { isError, error } = UseContinuousCheck(loggedIn);
   const { isLoading: usersIsLoading, isError: usersIsError } =
     UseAllUser(loggedIn);
-  const { isLoading: roomsIsLoading, isError: roomssIsError } =
-    UseUserRooms(loggedIn);
+
+  const {
+    isLoading: roomsIsLoading,
+    isError: roomssIsError,
+    isSuccess,
+    data,
+  } = UseUserRooms(loggedIn);
+
+  const {
+    isLoading: roomChatsIsLoading,
+    isError: roomChatsIsError,
+    error: roomChatsError,
+  } = UseRoomChats({ toggle: isSuccess, list: data?.data });
 
   useEffect(() => {
-    if (isError || usersIsError || roomssIsError) {
+    if (isError || usersIsError || roomssIsError || roomChatsIsError) {
       navigate("/error", {
         state: {
-          errMsg: error?.message || "Something went wrong. Please login Again",
+          errMsg:
+            error?.message ||
+            roomChatsError?.message ||
+            "Something went wrong. Please login Again",
         },
       });
       removeCookies();
     }
-  }, [isError, usersIsError, roomssIsError, error, navigate]);
+  }, [
+    isError,
+    usersIsError,
+    roomssIsError,
+    error,
+    navigate,
+    roomChatsIsError,
+    roomChatsError,
+  ]);
 
   useEffect(() => {
     if (!loggedIn) {
@@ -36,7 +59,7 @@ const RootLayout = () => {
 
   if (!loggedIn) return;
 
-  if (usersIsLoading || roomsIsLoading) {
+  if (usersIsLoading || roomsIsLoading || roomChatsIsLoading) {
     return <Loading />;
   }
 

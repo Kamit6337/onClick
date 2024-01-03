@@ -112,7 +112,7 @@ const SignUp = () => {
   return (
     <div className="h-screen w-full flex flex-col gap-2 justify-center items-center bg-color_2">
       {/* NOTE: THE CENTER PAGE */}
-      <div className="bg-color_1 box_shadow  h-[600px] w-[500px] border border-color_3 rounded-xl  justify-between items-center   flex flex-col p-6">
+      <div className="bg-color_1 box_shadow  h-[600px] w-[600px] border border-color_3 rounded-xl  justify-between items-center   flex flex-col p-6">
         {/* WORK: FORM AND GO TO LOGIN BUTTON*/}
         <p className="text-xl font-bold tracking-wide">Sign Up</p>
 

@@ -6,8 +6,6 @@ import createGroupRoom from "../controllers/roomControllers/createGroupRoom.js";
 
 const router = express.Router();
 
-router.post("/group", createGroupRoom);
-
 router.route("/").get(getUserRooms).patch(updateRoom).delete(deleteRoom);
 
 export default router;

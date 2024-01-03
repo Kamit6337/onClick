@@ -1,15 +1,49 @@
-import { useQuery } from "@tanstack/react-query";
+import { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
+import { setRooms } from "../../redux/slice/roomSlice";
 import { getReq } from "../../utils/api/api";
 
-const UseRoomChats = ({ toggle = false, id, page = 1 }) => {
-  const query = useQuery({
-    queryKey: ["roomChats", id, page],
-    queryFn: () => getReq("/chat", { id }),
-    staleTime: 5 * 60 * 1000,
-    enabled: toggle,
-  });
+const UseRoomChats = ({ toggle = false, list }) => {
+  const dispatch = useDispatch();
+  const [isLoading, setLoadingList] = useState(false);
+  const [isError, setIsErrorList] = useState(false);
+  const [error, setErrorList] = useState(null);
+  const [roomChatsData, setRoomChatsData] = useState(null);
 
-  return query;
+  useEffect(() => {
+    const fetchRoomChats = async () => {
+      try {
+        setLoadingList(true);
+
+        const requests = list.map(async (room) => {
+          const roomChats = await getReq("/chat", { id: room.id });
+
+          return { ...room, chats: roomChats?.data };
+        });
+
+        const results = await Promise.all(requests);
+
+        setRoomChatsData(results);
+      } catch (error) {
+        setErrorList(error);
+        setIsErrorList(true);
+      } finally {
+        setLoadingList(false);
+      }
+    };
+
+    if (toggle) {
+      fetchRoomChats();
+    }
+  }, [toggle, list]);
+
+  useEffect(() => {
+    if (roomChatsData) {
+      dispatch(setRooms(roomChatsData));
+    }
+  }, [roomChatsData, dispatch]);
+
+  return { isLoading, isError, error };
 };
 
 export default UseRoomChats;

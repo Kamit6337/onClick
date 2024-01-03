@@ -1,46 +1,26 @@
-import { useEffect, useState } from "react";
-import Header from "./components/Header";
-import SidebarMenu from "./components/SidebarMenu";
-import ChatRoom from "./components/ChatRoom";
+import { useEffect } from "react";
+import SidebarMenu from "./components/SidebarMenu/SidebarMenu";
+import ChatRoom from "./components/ChatRoom/ChatRoom";
 import { ErrorBoundary } from "react-error-boundary";
-import UseUserRooms from "../../hooks/query/UseUserRooms";
 import UseSocket from "../../hooks/socket/UseSocket";
+import { useDispatch, useSelector } from "react-redux";
+import { updateRooms } from "../../redux/slice/roomSlice";
+import { toggleInitialState } from "../../redux/slice/toggleSlice";
+import GroupChatForm from "./components/SidebarMenu/components/GroupChatForm";
+import SearchUsers from "../../components/SearchUsers";
+import UpdateGroupChatForm from "./components/ChatRoom/components/UpdateGroupChatForm";
 
 const Home = () => {
-  const [activeRoom, setActiveRoom] = useState(null);
-  const { data } = UseUserRooms(true);
-  const { socket, on, off } = UseSocket();
-  const [rooms, setRooms] = useState(data?.rooms);
-  const [list, setList] = useState(null);
+  const { socket, on, off, emit } = UseSocket();
+  const dispatch = useDispatch();
+  const { groupChatForm, updateGroupChat } = useSelector(toggleInitialState);
 
   useEffect(() => {
     const chatArg = (arg) => {
-      const { room } = arg;
-
-      setRooms((prev) => {
-        prev = prev.map((rum) => {
-          if (rum.id === room) {
-            rum.chats = [...rum.chats, arg];
-          }
-          return rum;
-        });
-
-        return prev;
-      });
+      dispatch(updateRooms(arg));
     };
     const imageArg = (arg) => {
-      const { room } = arg;
-
-      setRooms((prev) => {
-        prev = prev.map((rum) => {
-          if (rum.id === room) {
-            rum.chats = [...rum.chats, arg];
-          }
-          return rum;
-        });
-
-        return prev;
-      });
+      dispatch(updateRooms(arg));
     };
 
     on("chatMsg", chatArg);
@@ -51,27 +31,44 @@ const Home = () => {
       off("chatMsg", chatArg);
       off("image", imageArg);
     };
-  }, [socket, on, off]);
+  }, [socket, on, off, dispatch]);
 
-  const showRoomChats = (roomId) => {
-    const findRoom = rooms?.find((room) => room.id === roomId);
-    setList(findRoom?.chats);
-    setActiveRoom(roomId);
+  const createRoom = (user) => {
+    emit("createSingleRoom", { id: user.id }, (err) => {
+      console.log("createRoom", err);
+    });
   };
 
   return (
-    <section className="w-full h-full ">
-      <Header />
-      <main className="w-full flex" style={{ height: "calc(100% - 56px)" }}>
-        {/* WORK: SIDEBAR MENU */}
-        <SidebarMenu activeRoom={activeRoom} showRoomChats={showRoomChats} />
+    <>
+      <article className="w-full h-full flex ">
+        {/* <div className="w-full h-14">
+          <Header />
+        </div> */}
 
-        {/* WORK: CHAT MESSAGES */}
-        <ErrorBoundary fallback={<div>Something went wrong</div>}>
-          <ChatRoom activeRoom={activeRoom} list={list} key={1} />
-        </ErrorBoundary>
-      </main>
-    </section>
+        <section className="basis-72 h-full border-r border-color_2">
+          <header className="w-full h-14 px-4 border-b border-color_2">
+            <SearchUsers userSelected={createRoom} />
+          </header>
+          <div className="w-full" style={{ height: "calc(100% - 56px)" }}>
+            {/* MARK: SIDEBAR MENU */}
+            <SidebarMenu />
+          </div>
+        </section>
+
+        <main
+          className="flex-1 h-full"
+          // style={{ height: "calc(100% - 56px)" }}
+        >
+          {/* MARK: CHAT MESSAGES */}
+          <ErrorBoundary fallback={<div>Something went wrong</div>}>
+            <ChatRoom />
+          </ErrorBoundary>
+        </main>
+      </article>
+      {groupChatForm && <GroupChatForm />}
+      {updateGroupChat && <UpdateGroupChatForm update={true} />}
+    </>
   );
 };
 

@@ -20,19 +20,20 @@ mongoose.connection.on("disconnected", () => {
 });
 
 // NOTE: DELETE CHAT
+// try {
+//   const chats = await Chat.deleteMany();
+//   const rooms = await Room.deleteMany();
+//   const users = await User.deleteMany();
+//   console.log("Chats has been deleted", chats);
+//   console.log("rooms has been deleted", rooms);
+//   console.log("users has been deleted", users);
 
-try {
-  const chats = await Chat.deleteMany({
-    photo: "images/Screenshot (14).png",
-  });
-  console.log("Chats has been deleted", chats);
+//   mongoose.connection.close();
+// } catch (error) {
+//   console.log("error", error);
 
-  mongoose.connection.close();
-} catch (error) {
-  console.log("error", error);
-
-  mongoose.connection.close();
-}
+//   mongoose.connection.close();
+// }
 
 // NOTE: DELETE ROOM AND CHAT DATA COMPLETELY
 // try {
@@ -53,23 +54,16 @@ try {
 
 // NOTE: UPDATE ROOM
 
-// try {
-//   const chats = await Room.updateMany(
-//     {},
-//     {
-//       $set: {
-//         isGroupChat: false,
-//       },
-//     }
-//   );
+try {
+  const chats = await Room.deleteMany({ name: "me and you" });
 
-//   console.log("update room", chats);
+  console.log("update room", chats);
 
-//   mongoose.connection.close();
-// } catch (error) {
-//   console.log("error", error);
-//   mongoose.connection.close();
-// }
+  mongoose.connection.close();
+} catch (error) {
+  console.log("error", error);
+  mongoose.connection.close();
+}
 
 // NOTE: TO DELETE THE DATA OF A MODEL FROM THE DATABASE
 // Chat.deleteMany()

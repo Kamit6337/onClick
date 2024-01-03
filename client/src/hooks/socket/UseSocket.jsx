@@ -19,7 +19,7 @@ const UseSocket = () => {
 
       setSocket(newSocket);
 
-      const roomList = roomsData?.roomList || [];
+      const roomList = roomsData?.data.map((room) => room.id);
 
       const joinConnectionArg = (arg) => {
         if (arg === "ok") {

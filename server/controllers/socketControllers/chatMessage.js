@@ -1,4 +1,5 @@
 import { Chat } from "../../models/chatModel.js";
+import { Room } from "../../models/roomModel.js";
 
 const chatMessage = (io, socket) => {
   socket.on("chat", async (arg, callback) => {
@@ -15,6 +16,16 @@ const chatMessage = (io, socket) => {
         sender: userId,
       });
 
+      await Room.findOneAndUpdate(
+        {
+          _id : room
+        },
+        {
+          updatedAt : Date.now()
+        }
+      )
+
+
       if (!createChat) {
         console.log("Error in chat creation");
         return;
@@ -30,6 +41,8 @@ const chatMessage = (io, socket) => {
 
       callback({ status: "ok" });
     } catch (error) {
+      
+      callback({error : error.message})
       console.log("error", error);
     }
   });

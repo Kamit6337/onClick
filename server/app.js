@@ -17,6 +17,8 @@ import joinRoom from "./controllers/socketControllers/joinRoom.js";
 import createSingleRoom from "./controllers/socketControllers/createSingleRoom.js";
 import chatMessage from "./controllers/socketControllers/chatMessage.js";
 import chatImage from "./controllers/socketControllers/chatImage.js";
+import createGroupChat from "./controllers/socketControllers/createGroupChat.js";
+import updateGroupChat from "./controllers/socketControllers/updateGroupChat.js";
 
 const app = express();
 
@@ -49,17 +51,23 @@ io.on("connection", (socket) => {
 
   joinConnection(io, socket);
 
-  // WORK: JOIN INTO ROOM
+  // MARK: JOIN INTO ROOM
   joinRoom(io, socket);
 
-  // WORK: CREATE SINGLE ROOM
+  // MARK: CREATE SINGLE ROOM
   createSingleRoom(io, socket);
 
-  // WORK: CHAT MESSAGE SOCKET
+  // MARK: CHAT MESSAGE SOCKET
   chatMessage(io, socket);
 
-  // WORK: CHAT MESSAGE SOCKET
+  // MARK: CHAT IMAGE SOCKET
   chatImage(io, socket);
+
+  // MARK: CREATE GROUP CHAT
+  createGroupChat(io, socket);
+
+  // MARK: UPDATE GROUP CHAT
+  updateGroupChat(io, socket);
 });
 
 // NOTE: UNIDENTIFIED ROUTES

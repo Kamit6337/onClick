@@ -28,7 +28,19 @@ const OpenFileExplorer = () => {
     }
   };
 
-  return { isFile, ref, onClick, file, error, handleFile, reset };
+  const Input = () => {
+    return (
+      <input
+        type="file"
+        accept=".jpeg, .jpg, .png" // Specify accepted file types
+        style={{ display: "none" }}
+        ref={ref}
+        onChange={handleFile}
+      />
+    );
+  };
+
+  return { onClick, isFile, file, error, reset, Input };
 };
 
 export default OpenFileExplorer;

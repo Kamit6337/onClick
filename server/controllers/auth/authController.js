@@ -4,6 +4,9 @@ import catchAsyncError from "../../utils/catchAsyncError.js";
 import generateWebToken from "../../utils/generateWebToken.js";
 import { User } from "../../models/userModel.js";
 import Req from "../../utils/Req.js";
+import axios from "axios";
+import path from "path";
+import fs from "fs";
 
 // NOTE: UPDATE USER
 export const updateUser = catchAsyncError(async (req, res) => {
@@ -37,13 +40,35 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
 
   // WORK: IF NOT FIND USER
   if (!findUser) {
-    // WORK: CREATE USER
+    // images folder inside public already present
+    const publicFolderPath = path.join("public", "images");
 
-    console.log("new user is creating");
+    // Make an HTTP request to the image URL
+    const response = await axios.get(picture, { responseType: "arraybuffer" });
+
+    // Generate a unique filename for the saved image
+    const fileName = `image_${Date.now()}.jpeg`;
+
+    const saveFilePath = `images/${fileName}`;
+    // Save the image to the public folder
+    const filePath = path.join(publicFolderPath, fileName);
+
+    // Use fs.writeFile with a Promise to handle it asynchronously
+    await new Promise((resolve, reject) => {
+      fs.writeFile(filePath, response.data, (err) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve();
+        }
+      });
+    });
+
+    // WORK: CREATE USER
     const createUser = await User.create({
       name,
       email,
-      photo: picture,
+      photo: saveFilePath,
       OAuthId: id,
       OAuthProvider: provider,
     });
