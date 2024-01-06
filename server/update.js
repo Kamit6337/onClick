@@ -67,9 +67,14 @@ mongoose.connection.on("disconnected", () => {
 
 // NOTE: CHAT
 try {
-  const updateResult = await Chat.deleteMany({
-    isFile: true,
-  });
+  const updateResult = await Chat.updateMany(
+    {},
+    {
+      $unset: {
+        fileType: "",
+      },
+    }
+  );
 
   console.log("Chat fields updated successfully", updateResult);
   mongoose.connection.close();

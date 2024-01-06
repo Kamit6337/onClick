@@ -28,7 +28,6 @@ const videoFilter = (req, file, cb) => {
 // MARK: CHAT IMAGE STORAGE
 const chatImageStorage = multer.diskStorage({
   destination: (req, file, cb) => {
-    console.log("file", file);
     cb(null, "public/images/chat"); // Specify the destination folder
   },
   filename: (req, file, cb) => {
@@ -68,7 +67,6 @@ const groupChatProfileStorage = multer.diskStorage({
     cb(null, "public/images/groupChatProfile"); // Specify the destination folder
   },
   filename: (req, file, cb) => {
-    console.log("file", file);
     cb(
       null,
       `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
@@ -87,7 +85,6 @@ const chatPDFStorage = multer.diskStorage({
     cb(null, "public/pdfs/chat"); // Specify the destination folder
   },
   filename: (req, file, cb) => {
-    console.log("file", file);
     cb(
       null,
       `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`
@@ -106,7 +103,6 @@ const chatVideoStorage = multer.diskStorage({
     cb(null, "public/videos/chat"); // Specify the destination folder
   },
   filename: (req, file, cb) => {
-    console.log("file", file);
     cb(
       null,
       `${file.fieldname}_${Date.now()}${path.extname(file.originalname)}`

@@ -4,8 +4,9 @@ import catchAsyncError from "./catchAsyncError";
 
 const SERVER_URL = environment.SERVER_URL;
 
-export const downloadReq = catchAsyncError(async (path, body) => {
-  const get = await axios.post(`${SERVER_URL}/download${path}`, body, {
+export const downloadReq = catchAsyncError(async (path, params) => {
+  const get = await axios.get(`${SERVER_URL}/download${path}`, {
+    params,
     withCredentials: true,
     responseType: "blob",
   });

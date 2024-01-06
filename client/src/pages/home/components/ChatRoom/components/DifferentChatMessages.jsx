@@ -1,59 +1,29 @@
 /* eslint-disable react/prop-types */
-import { useEffect } from "react";
 import { Icons } from "../../../../../assets/icons";
 import DownloadFile from "../../../../../hooks/query/DownloadFile";
 import UseContinuousCheck from "../../../../../hooks/query/UseContinuousCheck";
 import environment from "../../../../../utils/environment";
 import changeDate from "../../../../../utils/javaScript/changeDate";
-import download from "../../../../../lib/download";
-import { useMutation } from "@tanstack/react-query";
-import { downloadReq } from "../../../../../utils/api/downloadApi";
 
 const SERVER_URL = environment.SERVER_URL;
 
 const DifferentChatMessages = ({ chat }) => {
   const { data: user } = UseContinuousCheck(true);
-  const {
-    mutate,
-    data: response,
-    isSuccess,
-  } = useMutation({
-    mutationKey: ["file"],
-    mutationFn: ({ fileType, path }) => downloadReq(`/${fileType}`, { path }),
-  });
 
   let {
     message,
     sender: { _id: id, name },
     updatedAt,
     isFile,
-    fileType,
-    file,
+    file: { fileType, originalName, destination, fileName, size },
   } = chat;
 
-  useEffect(() => {
-    if (isSuccess) {
-      // Convert the response to a blob and create a download link
-      const blob = new Blob([response.data], {
-        type: response.headers["content-type"],
-      });
-
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-
-      // Extract filename from response headers or use a fixed name
-      const contentDisposition = response.headers["content-disposition"];
-      const fileName = contentDisposition
-        ? contentDisposition.split("filename=")[1]
-        : "downloadedFile.pdf";
-
-      link.download = fileName;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(link.href);
-    }
-  }, [isSuccess, response]);
+  const { refetch } = DownloadFile({
+    fileType,
+    originalName,
+    destination,
+    fileName,
+  });
 
   if (!isFile) {
     if (id !== user?.id) {
@@ -84,9 +54,9 @@ const DifferentChatMessages = ({ chat }) => {
     }
   }
 
-  if (fileType === "image") {
-    const photo = `${SERVER_URL}/${file}`;
+  const file = `${SERVER_URL}/${destination}/${fileName}`;
 
+  if (fileType === "image") {
     if (id !== user?.id) {
       return (
         <div className={`flex items-end gap-2 w-max self-end `}>
@@ -97,7 +67,7 @@ const DifferentChatMessages = ({ chat }) => {
               {name.split(" ")[0]}
             </p>
             <img
-              src={photo}
+              src={file}
               alt="photo"
               className="w-full rounded-b-xl"
               loading="lazy"
@@ -113,7 +83,7 @@ const DifferentChatMessages = ({ chat }) => {
               {name.split(" ")[0]}
             </p>
             <img
-              src={photo}
+              src={file}
               alt="photo"
               className="w-full rounded-xl"
               loading="lazy"
@@ -126,8 +96,6 @@ const DifferentChatMessages = ({ chat }) => {
   }
 
   if (fileType === "pdf") {
-    const pdfPath = file;
-
     if (id !== user?.id) {
       return (
         <div className={`flex items-end gap-2 w-max self-end `}>
@@ -139,9 +107,20 @@ const DifferentChatMessages = ({ chat }) => {
             </p>
             <div className="relative h-24 w-full  bg-color_2">
               <p>PDF</p>
+              <p>{originalName}</p>
+              <p>{+size / 1024} kb</p>
               <div
                 className="absolute z-10 bottom-0 right-0 rounded-full border border-color_4 p-1 cursor-pointer"
-                onClick={() => mutate({ fileType: "pdf", path: pdfPath })}
+                onClick={
+                  () => refetch()
+                  // refetch({
+                  //   queryKey: [
+                  //     "file",
+                  //     "pdf",
+                  //     { destination, fileName, originalName },
+                  //   ],
+                  // })
+                }
               >
                 <Icons.download />
               </div>

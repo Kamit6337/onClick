@@ -1,25 +1,46 @@
 import HandleGlobalError from "../../utils/HandleGlobalError.js";
 import catchAsyncError from "../../utils/catchAsyncError.js";
+import path from "path";
+import fs from "fs";
 
 const getPDFDownload = catchAsyncError(async (req, res, next) => {
-  const { path } = req.body; //images/image.jpeg
+  const { destination, fileName, originalName } = req.query;
 
-  console.log("path", path);
-
-  if (!path) {
-    return next(new HandleGlobalError("Path is not provided", 404));
+  if (!destination || !fileName || !originalName) {
+    return next(new HandleGlobalError("Fields are not provided", 404));
   }
 
-  const filePath = `/public/${path}`;
+  let filePath = `public/${destination}/${fileName}`;
 
-  const now = new Date();
-  const date = now.getDate();
-  const month = now.getMonth() + 1;
-  const year = now.getFullYear();
+  filePath = path.join(filePath);
 
-  const fileName = `pdf_${date}-${month}:${year}.pdf`;
+  // Check if the file exists
+  if (!fs.existsSync(filePath)) {
+    return next(new HandleGlobalError("File is not found", 404));
+  }
 
-  res.download(filePath, fileName);
+  // Set the response headers for the download
+  res.setHeader("Content-Type", "application/pdf");
+
+  // Stream the file to the response
+  const fileStream = fs.createReadStream(filePath);
+  fileStream.pipe(res);
 });
 
 export default getPDFDownload;
+
+// const filename = req.params.filename;
+// const filePath = path.join(__dirname, `public/pdfs/${filename}`);
+
+// // Check if the file exists
+// if (!fs.existsSync(filePath)) {
+//   return res.status(404).send('File not found');
+// }
+
+// // Set the response headers for the download
+// res.setHeader('Content-Type', 'application/pdf');
+// res.setHeader('Content-Disposition', `attachment; filename=${filename}`);
+
+// // Stream the file to the response
+// const fileStream = fs.createReadStream(filePath);
+// fileStream.pipe(res);

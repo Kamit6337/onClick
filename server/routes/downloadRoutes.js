@@ -4,6 +4,6 @@ import getImageDownload from "../controllers/downloads/getImageDownload.js";
 
 const router = express.Router();
 
-router.post("/pdf", getPDFDownload).post("/image", getImageDownload);
+router.get("/pdf", getPDFDownload).get("/image", getImageDownload);
 
 export default router;

@@ -15,15 +15,28 @@ const chatImage = catchAsyncError(async (req, res, next) => {
     return next(new HandleGlobalError("Room ID is not provided", 404));
   }
 
-  const filePath = req.file.path;
+  let {
+    originalname: originalName,
+    destination,
+    size,
+    filename: fileName,
+  } = req.file;
+
+  destination = destination.replace("public/", "");
+
   // Modify the filePath to replace backslashes with forward slashes
-  const modifiedFilePath = filePath.replace(/\\/g, "/").replace("public/", "");
+  // const modifiedFilePath = filePath.replace(/\\/g, "/").replace("public/", "");
 
   const createChat = await Chat.create({
     room,
     sender: userId,
-    fileType: "image",
-    file: modifiedFilePath,
+    file: {
+      destination,
+      fileName,
+      fileType: "image",
+      originalName,
+      size,
+    },
   });
 
   await Room.findOneAndUpdate(

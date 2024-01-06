@@ -20,14 +20,28 @@ const chatSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
-    fileType: {
-      type: String,
-      enum: ["image", "video", "pdf"],
-      default: null,
-    },
     file: {
-      type: String,
-      default: null,
+      fileType: {
+        type: String,
+        enum: ["image", "video", "pdf"],
+        default: null,
+      },
+      originalName: {
+        type: String,
+        default: null,
+      },
+      destination: {
+        type: String,
+        default: null,
+      },
+      fileName: {
+        type: String,
+        default: null,
+      },
+      size: {
+        type: Number,
+        default: null,
+      },
     },
   },
   {
@@ -36,7 +50,7 @@ const chatSchema = new mongoose.Schema(
 );
 
 chatSchema.pre("save", function (next) {
-  if (this.file) {
+  if (!!this.file.fileType) {
     this.isFile = true;
   }
 
