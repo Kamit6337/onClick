@@ -4,7 +4,7 @@ import catchAsyncError from "../../../utils/catchAsyncError.js";
 import { environment } from "../../../utils/environment.js";
 import generateWebToken from "../../../utils/generateWebToken.js";
 
-// WORK: PLACED A DUMMY URL IN CASE USER DOES NOT PROVIDE PHOTO
+// MARK: PLACED A DUMMY URL IN CASE USER DOES NOT PROVIDE PHOTO
 const userPic = `${environment.SERVER_URL}/images/dummy_profile.png`;
 
 const signup = catchAsyncError(async (req, res, next) => {
@@ -14,7 +14,7 @@ const signup = catchAsyncError(async (req, res, next) => {
     return next(new HandleGlobalError("Not provided all field", 404));
   }
 
-  // WORK: CREATE USER
+  // MARK: CREATE USER
   const createUser = await User.create({
     name,
     email,
@@ -38,11 +38,6 @@ const signup = catchAsyncError(async (req, res, next) => {
 
   res.status(200).json({
     message: "SignUp Successfully",
-    id: createUser._id,
-    name: createUser.name,
-    photo: createUser.photo,
-    email: createUser.email,
-    role: createUser.role,
   });
 });
 

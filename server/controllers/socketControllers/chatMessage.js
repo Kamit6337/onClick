@@ -2,7 +2,7 @@ import { Chat } from "../../models/chatModel.js";
 import { Room } from "../../models/roomModel.js";
 
 const chatMessage = (io, socket) => {
-  socket.on("chat", async (arg, callback) => {
+  socket.on("chatMessage", async (arg, callback) => {
     const userId = socket.userId;
     const userName = socket.userName;
     const user = socket.user;
@@ -18,13 +18,12 @@ const chatMessage = (io, socket) => {
 
       await Room.findOneAndUpdate(
         {
-          _id : room
+          _id: room,
         },
         {
-          updatedAt : Date.now()
+          updatedAt: Date.now(),
         }
-      )
-
+      );
 
       if (!createChat) {
         console.log("Error in chat creation");
@@ -33,7 +32,7 @@ const chatMessage = (io, socket) => {
 
       createChat.sender = user;
 
-      io.to(room).emit("chatMsg", createChat, (err) => {
+      io.to(room).emit("chatMessage", createChat, (err) => {
         if (err) {
           console.log(err);
         }
@@ -41,8 +40,7 @@ const chatMessage = (io, socket) => {
 
       callback({ status: "ok" });
     } catch (error) {
-      
-      callback({error : error.message})
+      callback({ error: error.message });
       console.log("error", error);
     }
   });

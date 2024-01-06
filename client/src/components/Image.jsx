@@ -1,12 +1,12 @@
 /* eslint-disable react/prop-types */
 import { useEffect, useState } from "react";
-import OpenFileExplorer from "../lib/OpenFileExplorer";
 import ModeEditIcon from "@mui/icons-material/ModeEdit";
+import SelectImageFile from "../lib/SelectImageFile";
 
 const ImageComp = () => {
   const [selectedPhoto, setSelectedPhoto] = useState(null);
 
-  const { Input, isFile, file, reset, onClick } = OpenFileExplorer();
+  const { Input, isFile, file, reset, onClick } = SelectImageFile();
 
   useEffect(() => {
     if (isFile) {

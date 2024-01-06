@@ -2,8 +2,15 @@ const globalErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 400;
   err.status = err.status || "Error";
 
+  if (err.name === "MulterError" && err.code === "LIMIT_UNEXPECTED_FILE") {
+    err.statusCode = 404;
+    err.status = "Multer Error";
+    err.message =
+      "Please check your file once again. There is some issue in it.";
+  }
+
   if (err.name === "TokenError") {
-    err.statusCode = 40;
+    err.statusCode = 400;
     err.status = "unAuthorized";
     err.message = "Sorry, your OAuth token has expired";
   }

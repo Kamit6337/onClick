@@ -54,27 +54,29 @@ mongoose.connection.on("disconnected", () => {
 
 // NOTE: UPDATE ROOM
 
+// try {
+//   const chats = await Room.deleteMany({ name: "me and you" });
+
+//   console.log("update room", chats);
+
+//   mongoose.connection.close();
+// } catch (error) {
+//   console.log("error", error);
+//   mongoose.connection.close();
+// }
+
+// NOTE: CHAT
 try {
-  const chats = await Room.deleteMany({ name: "me and you" });
+  const updateResult = await Chat.deleteMany({
+    isFile: true,
+  });
 
-  console.log("update room", chats);
-
+  console.log("Chat fields updated successfully", updateResult);
   mongoose.connection.close();
 } catch (error) {
-  console.log("error", error);
+  console.log("Error updating chat fields", error);
   mongoose.connection.close();
 }
-
-// NOTE: TO DELETE THE DATA OF A MODEL FROM THE DATABASE
-// Chat.deleteMany()
-//   .then((res) => {
-//     console.log("Res", res);
-//     mongoose.connection.close(); // Close the connection after the operation
-//   })
-//   .catch((err) => {
-//     console.log("err", err);
-//     mongoose.connection.close(); // Close the connection on error
-//   });
 
 // NOTE: TO REMOVE UNIQUENESS FROM A SCHEMA
 // Assuming 'OAuthId' is the field with the unique index

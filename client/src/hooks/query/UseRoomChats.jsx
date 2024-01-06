@@ -16,7 +16,7 @@ const UseRoomChats = ({ toggle = false, list }) => {
         setLoadingList(true);
 
         const requests = list.map(async (room) => {
-          const roomChats = await getReq("/chat", { id: room.id });
+          const roomChats = await getReq("/chat", { id: room._id });
 
           return { ...room, chats: roomChats?.data };
         });

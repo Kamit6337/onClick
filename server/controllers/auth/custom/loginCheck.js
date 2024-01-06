@@ -27,7 +27,7 @@ const loginCheck = catchAsyncError(async (req, res, next) => {
 
   res.status(200).json({
     message: "User is present",
-    id: findUser._id,
+    _id: findUser._id,
     name: findUser.name,
     photo: findUser.photo,
     email: findUser.email,

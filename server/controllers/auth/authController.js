@@ -38,10 +38,10 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
 
   const findUser = await User.findOne({ OAuthId: id });
 
-  // WORK: IF NOT FIND USER
+  // MARK: IF NOT FIND USER
   if (!findUser) {
     // images folder inside public already present
-    const publicFolderPath = path.join("public", "images");
+    const publicFolderPath = path.join("public", "images", "userProfile");
 
     // Make an HTTP request to the image URL
     const response = await axios.get(picture, { responseType: "arraybuffer" });
@@ -49,7 +49,7 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
     // Generate a unique filename for the saved image
     const fileName = `image_${Date.now()}.jpeg`;
 
-    const saveFilePath = `images/${fileName}`;
+    const saveFilePath = `images/userProfile/${fileName}`;
     // Save the image to the public folder
     const filePath = path.join(publicFolderPath, fileName);
 
@@ -64,7 +64,7 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
       });
     });
 
-    // WORK: CREATE USER
+    // MARK: CREATE USER
     const createUser = await User.create({
       name,
       email,
@@ -88,17 +88,12 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
     });
 
     res.status(200).json({
-      message: "Login Successfully",
-      id: createUser._id,
-      name: createUser.name,
-      photo: createUser.photo,
-      email: createUser.email,
-      role: createUser.role,
+      message: "OAuth Login Successfully",
     });
     return;
   }
 
-  // WORK: IF FIND USER
+  // MARK: IF FIND USER
   const token = generateWebToken({
     id: findUser._id,
     role: findUser.role,
@@ -110,12 +105,7 @@ export const loginSuccess = catchAsyncError(async (req, res, next) => {
   });
 
   res.status(200).json({
-    message: "Login Successfully",
-    id: findUser._id,
-    name: findUser.name,
-    photo: findUser.photo,
-    email: findUser.email,
-    role: findUser.role,
+    message: "OAuth Login Successfully",
   });
   return;
 });

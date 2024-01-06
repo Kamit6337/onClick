@@ -8,9 +8,7 @@ import expressSessionOptions from "../utils/expressSessionOptions.js";
 import checkDatabaseConnection from "./checkDatabaseConnection.js";
 import compression from "compression";
 
-const globalMiddlewares = () => {
-  const app = express();
-
+const globalMiddlewares = (app) => {
   app.use(checkDatabaseConnection);
 
   // The middleware will attempt to compress response bodies for all request that traverse through the middleware

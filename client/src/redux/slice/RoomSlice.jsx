@@ -14,7 +14,7 @@ const RoomSlice = createSlice({
   reducers: {
     setActiveRoom: (state, { payload }) => {
       if (payload) {
-        const findRoom = state.rooms?.find((obj) => obj.id === payload);
+        const findRoom = state.rooms?.find((obj) => obj._id === payload);
 
         return {
           ...state,
@@ -29,6 +29,7 @@ const RoomSlice = createSlice({
         return { ...state, rooms: payload };
       }
     },
+
     updateRooms: (state, { payload }) => {
       const { room } = payload;
 
@@ -41,7 +42,7 @@ const RoomSlice = createSlice({
 
       // Update rooms
       updatedState.rooms = state.rooms.map((obj) => {
-        if (obj.id === room) {
+        if (obj._id === room) {
           return {
             ...obj,
             chats: [...obj.chats, payload],

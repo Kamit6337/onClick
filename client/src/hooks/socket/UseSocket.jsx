@@ -3,6 +3,7 @@ import UseUserRooms from "../query/UseUserRooms";
 import environment from "../../utils/environment";
 import { io } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
+import Toastify from "../../lib/Toastify";
 
 const UseSocket = () => {
   const [socket, setSocket] = useState(null);
@@ -10,16 +11,21 @@ const UseSocket = () => {
   const navigate = useNavigate();
   const maxRetryAttempts = 10; // Maximum number of retry attempts
   let retryCounter = 0;
+  const { ToastContainer, showAlertMessage, showSuccessMessage } = Toastify();
 
   useEffect(() => {
     const connectSocket = () => {
+      showAlertMessage({
+        message: "Wait. Socket is Connecting",
+        position: "top-center",
+      });
       const newSocket = io(environment.SERVER_URL, {
         withCredentials: true,
       });
 
       setSocket(newSocket);
 
-      const roomList = roomsData?.data.map((room) => room.id);
+      const roomList = roomsData?.data.map((room) => room._id);
 
       const joinConnectionArg = (arg) => {
         if (arg === "ok") {
@@ -37,6 +43,10 @@ const UseSocket = () => {
 
       newSocket.on("connect", () => {
         // Reset retry counter on successful connection
+        showSuccessMessage({
+          message: "Socket connection Completed",
+          position: "top-center",
+        });
         retryCounter = 0;
       });
 
@@ -73,6 +83,7 @@ const UseSocket = () => {
   }, [roomsData, navigate]);
 
   return {
+    ToastContainer,
     socket,
     emit: (event, data, callback) => {
       // Wrapper function to emit events

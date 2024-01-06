@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import UseUserRooms from "../../../../hooks/query/UseUserRooms";
-import UseSocket from "../../../../hooks/socket/UseSocket";
 import UseContinuousCheck from "../../../../hooks/query/UseContinuousCheck";
 import { useDispatch } from "react-redux";
 import { setActiveRoom } from "../../../../redux/slice/roomSlice";
@@ -11,29 +10,11 @@ const SERVER_URL = environment.SERVER_URL;
 
 /* eslint-disable react/prop-types */
 const SidebarMenu = () => {
-  const { data, refetch } = UseUserRooms(true);
-  const { socket, on, off } = UseSocket();
+  const { data } = UseUserRooms(true);
   const { data: user } = UseContinuousCheck(true);
   const [roomSelected, setRoomSelected] = useState(null);
   const dispatch = useDispatch();
   const rooms = data?.data;
-
-  useEffect(() => {
-    const roomArg = (arg) => {
-      const { members } = arg;
-
-      if (members?.includes(user.id)) {
-        refetch();
-      }
-    };
-
-    on("singleRoomCreated", roomArg);
-
-    return () => {
-      // Cleanup: Remove the listener when the component unmounts
-      off("singleRoomCreated", roomArg);
-    };
-  }, [socket, on, off, refetch, user]);
 
   const showRoomChats = (roomId) => {
     setRoomSelected(roomId);
@@ -41,16 +22,13 @@ const SidebarMenu = () => {
   };
 
   return (
-    <div
-      className="relative w-full h-full "
-      // style={{ height: "calc(100% - 56px)" }}
-    >
+    <div className="relative w-full h-full ">
       {rooms.length > 0 ? (
         rooms.map((room, i) => {
-          const { id, name, members, photo, isGroupChat } = room;
+          const { _id, name, members, photo, isGroupChat } = room;
 
           if (!isGroupChat) {
-            const friend = members.find((id) => id !== user.id);
+            const friend = members.find((friend) => friend._id !== user._id);
 
             const {
               name: friendName,
@@ -64,9 +42,9 @@ const SidebarMenu = () => {
               <div
                 key={i}
                 className={`w-full cursor-pointer hover:bg-color_3 hover:text-color_1 pl-6 border-b border-color_2 p-3 flex items-center gap-4 ${
-                  id === roomSelected && "bg-color_3 text-color_1"
+                  _id === roomSelected && "bg-color_3 text-color_1"
                 }`}
-                onClick={() => showRoomChats(id)}
+                onClick={() => showRoomChats(_id)}
               >
                 <img
                   src={userPhoto}
@@ -89,9 +67,9 @@ const SidebarMenu = () => {
               <div
                 key={i}
                 className={`w-full cursor-pointer hover:bg-color_3 hover:text-color_1 pl-6 border-b border-color_2 p-3 flex items-center gap-4 ${
-                  id === roomSelected && "bg-color_3 text-color_1"
+                  _id === roomSelected && "bg-color_3 text-color_1"
                 }`}
-                onClick={() => showRoomChats(id)}
+                onClick={() => showRoomChats(_id)}
               >
                 <img
                   src={groupPhoto}

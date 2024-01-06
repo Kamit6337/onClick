@@ -1,15 +1,15 @@
 import { useEffect } from "react";
-import UseForgotPassword from "../../hooks/mutation/UseForgotPassword";
 import { useForm } from "react-hook-form";
 import validator from "validator";
 import Loading from "../../components/Loading";
 import { useNavigate } from "react-router-dom";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import ForgotPassword from "../../hooks/mutation/ForgotPassword";
 
-const ForgotPassword = () => {
+const ForgotPasswordPage = () => {
   const navigate = useNavigate();
-  const { mutate, isPending, isError, error, isSuccess } = UseForgotPassword();
+  const { mutate, isPending, isError, error, isSuccess } = ForgotPassword();
 
   const {
     register,
@@ -105,4 +105,4 @@ const ForgotPassword = () => {
   );
 };
 
-export default ForgotPassword;
+export default ForgotPasswordPage;

@@ -1,7 +1,6 @@
 import { Chat } from "../../models/chatModel.js";
 import HandleGlobalError from "../../utils/HandleGlobalError.js";
 import catchAsyncError from "../../utils/catchAsyncError.js";
-import changeUnderScoreId from "../../utils/javaScript/changeUnderScoreId.js";
 
 const getRoomChats = catchAsyncError(async (req, res, next) => {
   const { id } = req.query;
@@ -18,11 +17,9 @@ const getRoomChats = catchAsyncError(async (req, res, next) => {
     })
     .sort("+updatedAt");
 
-  const chatsId = changeUnderScoreId(chats);
-
   res.status(200).json({
     message: `Chats of Room : ${id}`,
-    data: chatsId,
+    data: chats,
   });
 });
 

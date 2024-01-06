@@ -1,6 +1,5 @@
 import catchAsyncError from "../../utils/catchAsyncError.js";
 import { Room } from "../../models/roomModel.js";
-import changeUnderScoreId from "../../utils/javaScript/changeUnderScoreId.js";
 import HandleGlobalError from "../../utils/HandleGlobalError.js";
 
 const getUserRooms = catchAsyncError(async (req, res, next) => {
@@ -30,13 +29,11 @@ const getUserRooms = catchAsyncError(async (req, res, next) => {
     return;
   }
 
-  let roomsId = changeUnderScoreId(rooms);
-
-  roomsId = roomsId.sort((a, b) => b.updatedAt - a.updatedAt);
+  rooms = rooms.sort((a, b) => b.updatedAt - a.updatedAt);
 
   res.status(200).json({
     message: "User rooms",
-    data: roomsId,
+    data: rooms,
   });
 });
 

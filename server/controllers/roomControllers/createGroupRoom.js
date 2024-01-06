@@ -2,33 +2,59 @@ import catchAsyncError from "../../utils/catchAsyncError.js";
 import { Room } from "../../models/roomModel.js";
 import HandleGlobalError from "../../utils/HandleGlobalError.js";
 
+const groupPic = `images/dummy/dummy_group.jpeg`;
+
 const createGroupRoom = catchAsyncError(async (req, res, next) => {
   const userId = req.userId;
+  const { io } = initSocket();
 
-  let { id, name, admin = userId } = req.body;
+  let { name, members } = req.body;
 
-  const findUser = id?.includes(userId);
-
-  if (!id || id.length === 0 || name) {
-    return next(new HandleGlobalError("Not provide the Id", 404));
+  if (name || members) {
+    return next(new HandleGlobalError("Not provided name or members", 404));
   }
 
-  let members = new Set([...id, userId]);
-  members = [...members];
+  members = JSON.parse(members);
 
-  const room = await Room.create({
-    name,
-    members,
-    admin,
-  });
+  const filePath = req.file?.path;
 
-  if (!room) {
-    return next(new HandleGlobalError("Issue in room creation", 403));
+  if (!filePath) {
+    await Room.create({
+      name,
+      members,
+      photo: groupPic,
+      admin: userId,
+      isGroupChat: true,
+    });
+
+    io.emit("groupRoom", { members });
+
+    res.status(200).json({
+      message: "Group Room is created",
+    });
+
+    return;
+  } else {
+    // Modify the filePath to replace backslashes with forward slashes
+    const modifiedFilePath = filePath
+      .replace(/\\/g, "/")
+      .replace("public/", "");
+
+    await Room.create({
+      name,
+      members,
+      photo: modifiedFilePath,
+      admin: userId,
+      isGroupChat: true,
+    });
+
+    io.emit("groupRoom", { members });
+
+    res.status(200).json({
+      message: "Group Room is created",
+    });
+
+    return;
   }
-
-  res.status(200).json({
-    message: "Group Room is created",
-    data: room,
-  });
 });
 export default createGroupRoom;

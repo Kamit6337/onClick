@@ -16,11 +16,16 @@ const chatSchema = new mongoose.Schema(
       type: String,
       default: null,
     },
-    isPhoto: {
+    isFile: {
       type: Boolean,
       default: false,
     },
-    photo: {
+    fileType: {
+      type: String,
+      enum: ["image", "video", "pdf"],
+      default: null,
+    },
+    file: {
       type: String,
       default: null,
     },
@@ -31,8 +36,8 @@ const chatSchema = new mongoose.Schema(
 );
 
 chatSchema.pre("save", function (next) {
-  if (this.photo) {
-    this.isPhoto = true;
+  if (this.file) {
+    this.isFile = true;
   }
 
   next();

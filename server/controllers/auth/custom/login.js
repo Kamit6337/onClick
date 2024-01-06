@@ -7,7 +7,7 @@ import { environment } from "../../../utils/environment.js";
 const login = catchAsyncError(async (req, res, next) => {
   const { email, password } = req.body;
 
-  //   WORK: IF USER DOES NOT PROVIDE EITHER EMAIL OR PASSWORD
+  //   MARK: IF USER DOES NOT PROVIDE EITHER EMAIL OR PASSWORD
   if (!email || !password) {
     return next(
       new HandleGlobalError("Email or Password is not provided", 404)
@@ -16,12 +16,12 @@ const login = catchAsyncError(async (req, res, next) => {
 
   const findUser = await User.findOne({ email });
 
-  //   WORK: IF USER DOES NOT EXIST WITH THAT PASSWORD THROW ERROR
+  //   MARK: IF USER DOES NOT EXIST WITH THAT PASSWORD THROW ERROR
   if (!findUser) {
     return next(new HandleGlobalError("Email or Password is incorrect", 404));
   }
 
-  //   WORK: CHECK FORGOT PASSWORD EMAIL, NEW PASSWORD
+  //   MARK: CHECK FORGOT PASSWORD EMAIL, NEW PASSWORD
   const userFromSession = req.session?.confirmOTP
     ?.filter((obj) => obj.email === email)
     .at(-1);
@@ -49,7 +49,7 @@ const login = catchAsyncError(async (req, res, next) => {
       (obj) => obj.email !== email
     );
   } else {
-    //   WORK: IF USER PASSWORD DOES NOT MATCH WITH HASH PASSWORD, THROW ERROR
+    //   MARK: IF USER PASSWORD DOES NOT MATCH WITH HASH PASSWORD, THROW ERROR
     const isPasswordValid = findUser.checkPassword(password); // Boolean
 
     if (!isPasswordValid) {
@@ -57,7 +57,7 @@ const login = catchAsyncError(async (req, res, next) => {
     }
   }
 
-  //   WORK: UPDATE THE USER PROFILE AFTER SUCCESSFUL LOGIN
+  //   MARK: UPDATE THE USER PROFILE AFTER SUCCESSFUL LOGIN
   await User.findOneAndUpdate(
     {
       _id: findUser._id,
@@ -68,7 +68,7 @@ const login = catchAsyncError(async (req, res, next) => {
     }
   );
 
-  //   WORK: USER EMAIL AND PASSWORD IS CONFIRMED, SEND TOKEN AND MAKE LOGIN
+  //   MARK: USER EMAIL AND PASSWORD IS CONFIRMED, SEND TOKEN AND MAKE LOGIN
   const token = generateWebToken({
     id: findUser._id,
     role: findUser.role,
@@ -81,11 +81,6 @@ const login = catchAsyncError(async (req, res, next) => {
 
   res.status(200).json({
     message: "Login Successfully",
-    id: findUser._id,
-    name: findUser.name,
-    photo: findUser.photo,
-    email: findUser.email,
-    role: findUser.role,
   });
 });
 

@@ -26,7 +26,7 @@ const protectRoute = catchAsyncError(async (req, res, next) => {
   }
 
   req.userId = String(findUser._id);
-  // req.userId = decodedId.id;
+  req.user = findUser;
 
   next();
 });

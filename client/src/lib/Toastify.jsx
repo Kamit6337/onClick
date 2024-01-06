@@ -2,23 +2,35 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 const Toastify = () => {
-  const showErrorMessage = ({ message, time = 5000 } = {}) => {
+  const showErrorMessage = ({
+    message,
+    time = 3000,
+    position = "top-right",
+  } = {}) => {
     toast.error(message || "Somethings went Wrong !", {
-      position: toast.POSITION.TOP_RIGHT,
       autoClose: time,
+      position: position,
     });
   };
 
-  const showSuccessMessage = ({ message, time = 5000 } = {}) => {
+  const showSuccessMessage = ({
+    message,
+    time = 3000,
+    position = "top-right",
+  } = {}) => {
     toast.success(message || "Somethings went Wrong !", {
-      position: toast.POSITION.TOP_RIGHT,
+      position: position,
       autoClose: time,
     });
   };
 
-  const showAlertMessage = ({ message, time = 5000 } = {}) => {
+  const showAlertMessage = ({
+    message,
+    time = 3000,
+    position = "top-right",
+  } = {}) => {
     toast.warn(message || "Somethings went Wrong !", {
-      position: toast.POSITION.TOP_RIGHT,
+      position: position,
       autoClose: time,
     });
   };
