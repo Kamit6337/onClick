@@ -19,6 +19,9 @@ const Login = () => {
 
   const { state } = useLocation();
 
+  const [oAuthLoginState, setOAuthLoginState] = useState(state || null);
+  console.log("state from login", state);
+
   const { ToastContainer, showErrorMessage, showSuccessMessage } = Toastify();
 
   const {
@@ -45,10 +48,17 @@ const Login = () => {
   }, [loggedIn, navigate]);
 
   useEffect(() => {
-    if (isError || state) {
-      showErrorMessage({ message: error.message || state.message });
+    if (isError) {
+      showErrorMessage({ message: error.message });
     }
-  }, [isError, error, state, showErrorMessage]);
+  }, [isError, error, showErrorMessage]);
+
+  useEffect(() => {
+    if (oAuthLoginState) {
+      showErrorMessage({ message: oAuthLoginState.message });
+      setOAuthLoginState(null);
+    }
+  }, [oAuthLoginState, showErrorMessage]);
 
   useEffect(() => {
     if (isSuccess) {

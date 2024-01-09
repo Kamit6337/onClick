@@ -8,8 +8,8 @@ const updateGroupRoom = catchAsyncError(async (req, res, next) => {
 
   const { io } = initSocket();
 
-  if (name || members || admin) {
-    return next(new HandleGlobalError("Not provided name or members", 404));
+  if (!id || !name || !members || !admin) {
+    return next(new HandleGlobalError("Not provided all fields", 404));
   }
 
   members = JSON.parse(members);

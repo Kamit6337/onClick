@@ -3,65 +3,67 @@ import UseUserRooms from "../query/UseUserRooms";
 import environment from "../../utils/environment";
 import { io } from "socket.io-client";
 import { useNavigate } from "react-router-dom";
-import Toastify from "../../lib/Toastify";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  incSocketAttempt,
+  resetSocket,
+  socketState,
+} from "../../redux/slice/SocketSlice";
 
 const UseSocket = () => {
   const [socket, setSocket] = useState(null);
   const { data: roomsData } = UseUserRooms(true);
   const navigate = useNavigate();
-  const maxRetryAttempts = 10; // Maximum number of retry attempts
-  let retryCounter = 0;
-  const { ToastContainer, showAlertMessage, showSuccessMessage } = Toastify();
+  const maxRetryAttempts = 3; // Maximum number of retry attempts
+  const [isConnecting, setIsConnecting] = useState(false);
+  const [isReconnecting, setIsReconnecting] = useState(false);
+  const [isReconnected, setIsReconnected] = useState(false);
+  const [isConnected, setIsConnected] = useState(false);
+  const [isDisconnected, setIsDisconnected] = useState(false);
+  const socketAttempt = useSelector(socketState);
+  const dispatch = useDispatch();
+
+  const connectSocket = () => {
+    setIsDisconnected(false);
+    setIsConnecting(true);
+    const newSocket = io(environment.SERVER_URL, {
+      withCredentials: true,
+    });
+
+    setSocket(newSocket);
+
+    newSocket.on("connect", () => {
+      // Reset retry counter on successful connection
+      dispatch(resetSocket());
+      setIsConnected(true);
+      setIsDisconnected(false);
+      setIsConnecting(false);
+      setIsReconnecting(false);
+      setIsReconnected(false);
+    });
+
+    return newSocket;
+  };
+
+  // MARK: TO MAKE CONNECTION INITIALLY
+  useEffect(() => {
+    if (!isConnected) {
+      connectSocket();
+    }
+  }, [isConnected]);
 
   useEffect(() => {
-    const connectSocket = () => {
-      showAlertMessage({
-        message: "Wait. Socket is Connecting",
-        position: "top-center",
-      });
-      const newSocket = io(environment.SERVER_URL, {
-        withCredentials: true,
-      });
-
-      setSocket(newSocket);
-
-      const roomList = roomsData?.data.map((room) => room._id);
-
-      const joinConnectionArg = (arg) => {
-        if (arg === "ok") {
-          if (roomList.length > 0) {
-            newSocket.emit("joinRoom", { rooms: roomList }, (err) => {
-              if (err) {
-                // console.log("error", err); //{status : "ok"}
-              }
-            });
-          }
-        }
-      };
-
-      newSocket.on("joinConnection", joinConnectionArg);
-
-      newSocket.on("connect", () => {
-        // Reset retry counter on successful connection
-        showSuccessMessage({
-          message: "Socket connection Completed",
-          position: "top-center",
-        });
-        retryCounter = 0;
-      });
-
-      return newSocket;
-    };
-
     const handleConnectionError = (error) => {
       console.error("Socket connection error:", error);
-
-      // Increment the retry counter
-      retryCounter++;
+      setIsConnected(false);
+      setIsConnecting(false);
 
       // Retry connection if the maximum attempts are not reached
-      if (retryCounter < maxRetryAttempts) {
-        console.log(`Retrying socket connection. Attempt ${retryCounter}`);
+      if (socketAttempt.attempt < maxRetryAttempts) {
+        console.log(
+          `Retrying socket connection. Attempt ${socketAttempt.attempt}`
+        );
+        dispatch(incSocketAttempt());
         setTimeout(() => {
           setSocket(connectSocket());
         }, 1000); // Delay before retrying (adjust as needed)
@@ -71,19 +73,62 @@ const UseSocket = () => {
       }
     };
 
-    const initialSocket = connectSocket();
-
-    initialSocket.on("connect_error", handleConnectionError);
-
-    // Clean up the socket connection when the component unmounts
-    return () => {
-      initialSocket.off("connect_error", handleConnectionError);
-      initialSocket.disconnect();
+    const disconnectArg = () => {
+      console.log("Socket disconnected");
+      setIsDisconnected(true);
+      setIsConnecting(false);
+      setIsConnected(false);
+      setIsReconnecting(false);
+      setIsReconnected(false);
     };
-  }, [roomsData, navigate]);
+
+    const reconnectingArg = () => {
+      setIsReconnecting(true);
+    };
+    const reconnectArg = () => {
+      setIsReconnected(true);
+    };
+
+    const roomList = roomsData?.data.map((room) => room._id);
+
+    const joinConnectionArg = (arg) => {
+      if (arg === "ok") {
+        if (roomList.length > 0) {
+          socket.emit("joinRoom", { rooms: roomList }, (response) => {
+            if (response.status !== "ok") {
+              console.log("error from join room", response.error); //{status : "ok"}
+            }
+          });
+        }
+      }
+    };
+
+    if (socket) {
+      socket.on("joinConnection", joinConnectionArg);
+
+      // MARK: IF ERROR OCCUR ON CONNECTION
+      socket.on("connect_error", handleConnectionError);
+
+      // MARK: ON DISCONNECTED OR RECONNECTING OR RECONNECTED
+      socket.on("disconnect", disconnectArg);
+      socket.on("reconnecting", reconnectingArg);
+      socket.on("reconnect", reconnectArg);
+    }
+
+    return () => {
+      socket?.off("connect_error", handleConnectionError);
+      socket?.off("disconnect", disconnectArg);
+      socket?.off("reconnecting", reconnectingArg);
+      socket?.off("reconnect", reconnectArg);
+    };
+  }, [socket]);
 
   return {
-    ToastContainer,
+    isConnecting,
+    isConnected,
+    isDisconnected,
+    isReconnecting,
+    isReconnected,
     socket,
     emit: (event, data, callback) => {
       // Wrapper function to emit events

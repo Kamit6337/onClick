@@ -23,8 +23,7 @@ const getUserRooms = catchAsyncError(async (req, res, next) => {
   if (rooms.length === 0) {
     res.status(200).json({
       message: "No Room availbale",
-      rooms: [],
-      roomList: [],
+      data: [],
     });
     return;
   }

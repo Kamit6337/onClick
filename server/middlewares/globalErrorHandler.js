@@ -1,3 +1,5 @@
+import { environment } from "../utils/environment.js";
+
 const globalErrorHandler = (err, req, res, next) => {
   err.statusCode = err.statusCode || 400;
   err.status = err.status || "Error";
@@ -7,6 +9,12 @@ const globalErrorHandler = (err, req, res, next) => {
     err.status = "Multer Error";
     err.message =
       "Please check your file once again. There is some issue in it.";
+  }
+
+  if (err.name === "TypeError") {
+    err.statusCode = 404;
+    err.status = "Server Error";
+    err.message = "Server is download. Please login again after sometime!";
   }
 
   if (err.name === "TokenError") {
@@ -62,10 +70,8 @@ const globalErrorHandler = (err, req, res, next) => {
   }
 
   if (err.name === "InternalOAuthError") {
+    res.redirect(environment.CLIENT_CHECKLOGIN_URL);
     return;
-    err.statusCode = 403;
-    err.status = "Login Error";
-    err.message = "Error in Login. Please login again...";
   }
 
   const errorResponse = {

@@ -14,10 +14,12 @@ export const updateUser = catchAsyncError(async (req, res) => {
     const { id } = req.user;
 
     await User.findOneAndUpdate(
-      { id },
+      {
+        OAuthId: id,
+      },
       {
         $inc: { loginCount: 1 },
-        $currentDate: { lastLoginAt: true },
+        lastLogin: Date.now(),
       }
     );
   }
@@ -28,7 +30,9 @@ export const updateUser = catchAsyncError(async (req, res) => {
 // NOTE: LOGIN SUCCESS
 export const loginSuccess = catchAsyncError(async (req, res, next) => {
   if (!req.user)
-    return next(new HandleGlobalError("You are not logged in.", 403));
+    return next(
+      new HandleGlobalError("Error in login. Please try again!", 403)
+    );
 
   const {
     id,

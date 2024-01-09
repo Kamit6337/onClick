@@ -9,6 +9,7 @@ const chatMessage = (io, socket) => {
 
     const { room, message } = arg;
 
+    console.log("arg", arg);
     try {
       const createChat = await Chat.create({
         room,

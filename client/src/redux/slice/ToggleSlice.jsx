@@ -4,6 +4,10 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   groupChatForm: false,
   updateGroupChat: false,
+  showChatOptions: {
+    bool: false,
+    data: null,
+  },
 };
 
 const ToggleSlice = createSlice({
@@ -14,15 +18,21 @@ const ToggleSlice = createSlice({
       return { ...state, groupChatForm: payload };
     },
     toggleUpdateGroupChatForm: (state, { payload }) => {
-
-        
       return { ...state, updateGroupChat: payload };
+    },
+    toggleChatOptionOnRightClick: (state, { payload }) => {
+      const { bool, data } = payload;
+
+      return { ...state, showChatOptions: { data, bool } };
     },
   },
 });
 
-export const { toggleGroupChatForm, toggleUpdateGroupChatForm } =
-  ToggleSlice.actions;
+export const {
+  toggleGroupChatForm,
+  toggleUpdateGroupChatForm,
+  toggleChatOptionOnRightClick,
+} = ToggleSlice.actions;
 
 export const ToggleReducer = ToggleSlice.reducer;
 

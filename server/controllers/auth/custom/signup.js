@@ -5,10 +5,10 @@ import { environment } from "../../../utils/environment.js";
 import generateWebToken from "../../../utils/generateWebToken.js";
 
 // MARK: PLACED A DUMMY URL IN CASE USER DOES NOT PROVIDE PHOTO
-const userPic = `${environment.SERVER_URL}/images/dummy_profile.png`;
+const userPic = `images/userProfile/dummy_profile.png`;
 
 const signup = catchAsyncError(async (req, res, next) => {
-  const { name, email, password, photo } = req.body;
+  const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
     return next(new HandleGlobalError("Not provided all field", 404));
@@ -19,7 +19,7 @@ const signup = catchAsyncError(async (req, res, next) => {
     name,
     email,
     password,
-    photo: photo || userPic,
+    photo: userPic,
   });
 
   if (!createUser) {

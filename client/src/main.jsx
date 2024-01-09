@@ -11,7 +11,7 @@ import { ErrorBoundary } from "react-error-boundary";
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <ErrorBoundary fallback={<p>Something went wrong. Chekc Console</p>}>
+  <ErrorBoundary fallback={<p>Something went wrong. Check Console</p>}>
     <QueryClientProvider client={queryClient}>
       <Provider store={store}>
         <BrowserRouter>

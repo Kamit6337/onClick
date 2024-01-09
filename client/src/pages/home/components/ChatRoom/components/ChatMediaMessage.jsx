@@ -7,7 +7,6 @@ import { useEffect } from "react";
 import SpeedDial from "../../../../../components/SpeedDial";
 import SelectImageFile from "../../../../../lib/SelectImageFile";
 import ShowToastifyError from "../../../../../components/ShowToastifyError";
-import ShowToastifySuccess from "../../../../../components/ShowToastifySuccess";
 import { useSelector } from "react-redux";
 import { roomsState } from "../../../../../redux/slice/roomSlice";
 import SelectPdfFile from "../../../../../lib/SelectPdfFile";
@@ -38,9 +37,6 @@ export default function ChatMediaMessage() {
   const { ToastContainer: ErrorContainer } = ShowToastifyError({
     isError: imageMutation.isError || pdfMutation.isError,
     error: imageMutation.error || pdfMutation.error,
-  });
-  const { ToastContainer: SuccessContainer } = ShowToastifySuccess({
-    isSuccess: imageMutation.isSuccess || pdfMutation.isSuccess,
   });
 
   useEffect(() => {
@@ -84,7 +80,6 @@ export default function ChatMediaMessage() {
       <ImageInput />
       <PDFInput />
       <ErrorContainer />
-      <SuccessContainer />
     </>
   );
 }

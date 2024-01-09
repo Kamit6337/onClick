@@ -78,7 +78,7 @@ const SidebarMenu = () => {
                   className="w-10 h-10 rounded-full"
                 />
                 <div>
-                  <div>{name}</div>
+                  <div className="truncate">{name}</div>
                   <div className="text-xs">{members.length} members</div>
                 </div>
               </div>

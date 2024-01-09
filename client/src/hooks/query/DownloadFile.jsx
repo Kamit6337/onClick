@@ -1,47 +1,81 @@
 /* eslint-disable react/prop-types */
-import { useQuery } from "@tanstack/react-query";
 import { downloadReq } from "../../utils/api/downloadApi";
+import { useEffect, useState } from "react";
 
-const DownloadFile = ({ fileType, originalName, destination, fileName }) => {
-  const query = useQuery({
-    queryKey: ["file", fileType, originalName, fileName],
-    queryFn: () => {
-      return downloadReq(`/${fileType}`, {
-        destination,
-        fileName,
-        originalName,
-      });
-    },
-    enabled: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-    refetchOnMount: false,
-  });
+const DownloadFile = () => {
+  const [startDownload, setStartDownload] = useState(false);
+  const [value, setValue] = useState(null);
 
-  if (query.isSuccess) {
-    const response = query.data;
+  const handleDownload = (para) => {
+    setValue(para); //{ fileType, originalName, destination, fileName }
+    setStartDownload(true);
+  };
 
-    // Convert the response to a blob and create a download link
-    const blob = new Blob([response.data], {
-      type: response.headers["content-type"],
-    });
+  useEffect(() => {
+    const downloadFile = async () => {
+      try {
+        const { fileType, originalName, destination, fileName } = value;
+        const response = await downloadReq(`/${fileType}`, {
+          destination,
+          fileName,
+          originalName,
+        });
 
-    const link = document.createElement("a");
-    link.href = window.URL.createObjectURL(blob);
+        // Convert the response to a blob and create a download link
+        const blob = new Blob([response.data], {
+          type: response.headers["content-type"],
+        });
 
-    console.log("response header", response);
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
 
-    // Use the filename directly from the Content-Disposition header
-    const fileName = response.config.params.originalName;
+        console.log("response header", response);
 
-    link.download = fileName || "downloadedFile.pdf";
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(link.href);
-  }
+        // Use the filename directly from the Content-Disposition header
+        const downloadFileName = response.config.params.originalName;
 
-  return query;
+        link.download = downloadFileName || "downloadedFile.pdf";
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        window.URL.revokeObjectURL(link.href);
+
+        setStartDownload(false);
+      } catch (error) {
+        console.error("error in downloading", error);
+      }
+    };
+
+    if (startDownload) {
+      downloadFile();
+    }
+  }, [startDownload, value]);
+
+  // if (query.isSuccess) {
+  //   const response = query.data;
+
+  //   // Convert the response to a blob and create a download link
+  //   const blob = new Blob([response.data], {
+  //     type: response.headers["content-type"],
+  //   });
+
+  //   const link = document.createElement("a");
+  //   link.href = window.URL.createObjectURL(blob);
+
+  //   console.log("response header", response);
+
+  //   // Use the filename directly from the Content-Disposition header
+  //   const fileName = response.config.params.originalName;
+
+  //   link.download = fileName || "downloadedFile.pdf";
+  //   document.body.appendChild(link);
+  //   link.click();
+  //   document.body.removeChild(link);
+  //   window.URL.revokeObjectURL(link.href);
+  // }
+
+  // return query;
+  return { handleDownload };
 };
 
 export default DownloadFile;

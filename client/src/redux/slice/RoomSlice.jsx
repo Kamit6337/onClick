@@ -4,8 +4,6 @@ import { createSlice } from "@reduxjs/toolkit";
 const initialState = {
   activeRoom: null,
   rooms: [],
-  activeRoomChats: [],
-  activeRoomDetail: null,
 };
 
 const RoomSlice = createSlice({
@@ -13,51 +11,55 @@ const RoomSlice = createSlice({
   initialState,
   reducers: {
     setActiveRoom: (state, { payload }) => {
-      if (payload) {
-        const findRoom = state.rooms?.find((obj) => obj._id === payload);
-
-        return {
-          ...state,
-          activeRoom: payload,
-          activeRoomChats: findRoom.chats,
-          activeRoomDetail: findRoom,
-        };
-      }
+      return {
+        ...state,
+        activeRoom: payload,
+      };
     },
+
     setRooms: (state, { payload }) => {
-      if (payload) {
-        return { ...state, rooms: payload };
-      }
+      return { ...state, rooms: payload };
     },
 
     updateRooms: (state, { payload }) => {
       const { room } = payload;
 
-      let updatedState = { ...state }; // Create a copy of the state
-
-      if (room === state.activeRoom) {
-        // Update activeRoomChats
-        updatedState.activeRoomChats = [...state.activeRoomChats, payload];
-      }
-
-      // Update rooms
-      updatedState.rooms = state.rooms.map((obj) => {
+      // Modify the draft in place
+      state.rooms = state.rooms.map((obj) => {
         if (obj._id === room) {
-          return {
-            ...obj,
-            chats: [...obj.chats, payload],
-          };
+          obj.chats.push(payload);
         }
         return obj;
       });
-
-      return updatedState; // Return the updated state
+      return state; // Return the updated state
     },
-    extraReducer: (state) => state,
+    deleteChatUpdateRoom: (state, { payload }) => {
+      const chatId = payload;
+
+      state.rooms = state.rooms.map((room) => {
+        if (room._id === state.activeRoom) {
+          room.chats = room.chats.filter((chat) => chat._id !== chatId);
+        }
+
+        return room;
+      });
+
+      return state;
+    },
+    resetActiveRoom: (state) => {
+      return { ...state, activeRoom: null };
+    },
+    // extraReducer: (state) => state,
   },
 });
 
-export const { setActiveRoom, setRooms, updateRooms } = RoomSlice.actions;
+export const {
+  setActiveRoom,
+  setRooms,
+  updateRooms,
+  deleteChatUpdateRoom,
+  resetActiveRoom,
+} = RoomSlice.actions;
 
 export const RoomReducer = RoomSlice.reducer;
 

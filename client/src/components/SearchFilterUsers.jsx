@@ -1,13 +1,10 @@
 /* eslint-disable react/prop-types */
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import OnClickOutside from "../lib/onClickOutside";
 import { useForm } from "react-hook-form";
-import UseAllUser from "../hooks/query/UseAllUser";
 import environment from "../utils/environment";
 
-const SearchFilterUsers = ({ userSelected, remove, list = [] }) => {
-  const { data: users } = UseAllUser(true);
-  const [initialUsers, setInitialUsers] = useState(users?.data || []);
+const SearchFilterUsers = ({ userSelected, initialUsers = [] }) => {
   const [searchUsers, setSearchUsers] = useState([]);
 
   const { register, reset } = useForm({
@@ -21,22 +18,6 @@ const SearchFilterUsers = ({ userSelected, remove, list = [] }) => {
     setSearchUsers([]);
   };
   const { ref: divRef } = OnClickOutside(success);
-
-  useEffect(() => {
-    if (remove) {
-      setInitialUsers((prev) => [...prev, remove]);
-    }
-  }, [remove]);
-
-  useEffect(() => {
-    if (list.length > 0) {
-      list.forEach((user) => {
-        setInitialUsers((prev) => {
-          return prev.filter((preUser) => preUser.id !== user.id);
-        });
-      });
-    }
-  }, []);
 
   const handleSearch = (e) => {
     const { value } = e.target;
@@ -54,9 +35,6 @@ const SearchFilterUsers = ({ userSelected, remove, list = [] }) => {
 
   const handleUser = (user) => {
     setSearchUsers([]);
-    setInitialUsers((prev) => {
-      return prev.filter((obj) => obj.id !== user.id);
-    });
     userSelected(user);
   };
 

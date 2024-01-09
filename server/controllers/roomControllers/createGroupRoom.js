@@ -1,8 +1,9 @@
 import catchAsyncError from "../../utils/catchAsyncError.js";
 import { Room } from "../../models/roomModel.js";
 import HandleGlobalError from "../../utils/HandleGlobalError.js";
+import { initSocket } from "../../lib/initSocket.js";
 
-const groupPic = `images/dummy/dummy_group.jpeg`;
+const groupPic = `images/groupChatProfile/dummy_group.jpeg`;
 
 const createGroupRoom = catchAsyncError(async (req, res, next) => {
   const userId = req.userId;
@@ -10,7 +11,9 @@ const createGroupRoom = catchAsyncError(async (req, res, next) => {
 
   let { name, members } = req.body;
 
-  if (name || members) {
+  console.log("createGroupRoom", name, members);
+
+  if (!name || !members) {
     return next(new HandleGlobalError("Not provided name or members", 404));
   }
 

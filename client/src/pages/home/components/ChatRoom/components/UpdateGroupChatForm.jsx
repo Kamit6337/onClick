@@ -1,218 +1,253 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
-import { Icons } from "../../../../../assets/icons";
-import { Images } from "../../../../../assets/images";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  toggleGroupChatForm,
-  toggleUpdateGroupChatForm,
-} from "../../../../../redux/slice/toggleSlice";
+import { toggleUpdateGroupChatForm } from "../../../../../redux/slice/toggleSlice";
 import SearchFilterUsers from "../../../../../components/SearchFilterUsers";
 import UseContinuousCheck from "../../../../../hooks/query/UseContinuousCheck";
-import UseSocket from "../../../../../hooks/socket/UseSocket";
 import { useForm } from "react-hook-form";
-import UseUserRooms from "../../../../../hooks/query/UseUserRooms";
 import environment from "../../../../../utils/environment";
 import { roomsState } from "../../../../../redux/slice/roomSlice";
-import areArraysEqual from "../../../../../utils/javaScript/areArraysEqual";
 import Toastify from "../../../../../lib/Toastify";
 import ImageComp from "../../../../../components/Image";
+import UseAllUser from "../../../../../hooks/query/UseAllUser";
+import UpdateGroupChat from "../../../../../hooks/mutation/updateGroupChat";
+import ImageCrop from "../../ImageCrop/ImageCrop";
 
-const UpdateGroupChatForm = ({ update = false }) => {
-  const { emit } = UseSocket();
+const UpdateGroupChatForm = () => {
   const dispatch = useDispatch();
-  const { data } = UseContinuousCheck(true);
-  const { refetch } = UseUserRooms(true);
-  const { activeRoom, activeRoomDetail } = useSelector(roomsState);
-  const { showErrorMessage, ToastContainer } = Toastify();
-  const { Image, file } = ImageComp();
+  const { data: userData } = UseContinuousCheck(true);
+  const { data: users } = UseAllUser(true);
+  const { activeRoom, rooms } = useSelector(roomsState);
+  const [activeRoomDetail, setActiveRoomDetail] = useState(null);
+  const [initialUsers, setInitialUsers] = useState([]);
+  const [list, setList] = useState([]);
 
-  console.log("file", file);
+  const [isCropStart, setIsCropStart] = useState(false);
+  const [originalImageFile, setOriginalImageFile] = useState(null);
+  const [croppedImageSrc, setCroppedImageSrc] = useState(null);
+
+  const {
+    mutate,
+    isError,
+    error,
+    reset,
+    isSuccess,
+    data: mutateData,
+  } = UpdateGroupChat(activeRoom);
+
+  const { Image, file } = ImageComp();
+  const { ToastContainer, showErrorMessage, showSuccessMessage } = Toastify();
 
   const {
     register,
     formState: { errors },
     handleSubmit,
+    reset: resetFormName,
   } = useForm({
     defaultValues: {
-      name: update ? activeRoomDetail.name : "",
+      name: "",
     },
   });
 
-  const [list, setList] = useState(() => {
-    if (!update) {
-      return [data];
-    } else {
-      return activeRoomDetail.members;
+  useEffect(() => {
+    if (file) {
+      setOriginalImageFile(file);
+      setIsCropStart(true);
     }
-  });
+  }, [file]);
 
-  const [removeUser, setRemoveUser] = useState(null);
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(toggleUpdateGroupChatForm(false));
+    }
+  }, [isSuccess, showSuccessMessage, dispatch, mutateData, reset]);
+
+  useEffect(() => {
+    if (isError) {
+      showErrorMessage({ message: error.message, time: 3000 });
+
+      setTimeout(() => {
+        reset();
+      }, 3000);
+    }
+  }, [isError, error, showErrorMessage, reset]);
+
+  useEffect(() => {
+    if (activeRoom) {
+      const findRoom = rooms.find((room) => room._id === activeRoom);
+      const members = findRoom.members;
+      setList(members);
+      resetFormName({ name: findRoom.name });
+      setActiveRoomDetail(findRoom);
+
+      members.forEach((member) => {
+        const filterUsers = users?.data.filter(
+          (user) => user._id !== member._id
+        );
+        setInitialUsers(filterUsers);
+      });
+    }
+  }, [rooms, activeRoom, users]);
 
   const userSelected = (user) => {
     setList((prev) => [...prev, user]);
+    setInitialUsers((prev) => {
+      return prev.filter((obj) => obj._id !== user._id);
+    });
   };
 
   const handleRemoveUser = (user) => {
-    setRemoveUser(user);
     setList((prev) => {
-      return prev.filter((obj) => obj.id !== user.id);
+      return prev.filter((obj) => obj._id !== user._id);
     });
+    setInitialUsers((prev) => [...prev, user]);
   };
 
   const onSubmit = (data) => {
     const { name } = data;
-    const membersId = list?.map((user) => user._id);
 
-    if (!update) {
-      const obj = {
-        name,
-        members: membersId,
-      };
-
-      console.log("obj", obj);
-
-      emit("createGroupChat", obj, (response) => {
-        console.log("response", response);
-        dispatch(toggleGroupChatForm(false));
-        refetch();
+    if (list.length < 2) {
+      showErrorMessage({
+        message: "You have not selected users to make group",
+        time: 3000,
       });
-    } else {
-      const initialMembersId = activeRoomDetail.members.map((user) => user.id);
-
-      //   if (
-      //     name === activeRoomDetail.name &&
-      //     areArraysEqual(initialMembersId, membersId) &&
-      //     !file
-      //   ) {
-      //     return alert("you have not change anything this can't be updated");
-      //   }
-
-      const obj = {
-        id: activeRoom,
-        name,
-        members: membersId,
-        photo: file ,
-      };
-
-      console.log("obj", obj);
-
-      // MARK: NEED TO CREATE THAT SOCKET IN SERVER
-      emit("updateGroupChat", obj, (response) => {
-        console.log("response", response);
-        if (response.status !== "ok") {
-          showErrorMessage({ message: response.error });
-          return;
-        }
-
-        dispatch(toggleUpdateGroupChatForm(false));
-        refetch();
-      });
+      return;
     }
+
+    const membersId = list.map((user) => user._id);
+
+    const formData = new FormData();
+    formData.append("id", activeRoom);
+    formData.append("name", name);
+    formData.append("admin", activeRoomDetail.admin._id);
+    formData.append("members", JSON.stringify(membersId));
+
+    if (croppedImageSrc) {
+      formData.append("image", croppedImageSrc);
+      mutate(formData);
+      return;
+    }
+
+    mutate(formData);
   };
 
-  const groupPhoto = `${environment.SERVER_URL}/${activeRoomDetail.photo}`;
+  const handleOnCrop = (croppedFile) => {
+    setCroppedImageSrc(croppedFile);
+    setIsCropStart(false);
+  };
+
+  const handleCancelCrop = () => {
+    setOriginalImageFile(null);
+    setIsCropStart(false);
+  };
+
+  const groupPhoto = `${environment.SERVER_URL}/${activeRoomDetail?.photo}`;
 
   return (
     <>
       <section className="absolute top-0 z-50 w-screen h-screen backdrop-blur-sm flex justify-center items-center">
-        <div className="h-[500px] w-[700px]  flex justify-center items-start">
-          {/* MARK: FORM WITH CANCEL BUTTON */}
-          <div className="w-full h-full bg-color_1 border-2 rounded-xl border-color_4 text-color_4 flex flex-col justify-between ">
-            {/* MARK: FORM */}
-            <form
-              onSubmit={handleSubmit(onSubmit)}
-              className="h-full w-full flex flex-col justify-between"
-            >
-              <div className="h-24 p-6 border-b border-color_3 w-full  text-color_1">
-                <input
-                  type="text"
-                  placeholder="Name of Group"
-                  className="w-full px-4 py-2 rounded-xl"
-                  {...register("name", {
-                    required: true,
-                  })}
+        {/* MARK: FORM */}
+        <form
+          onSubmit={handleSubmit(onSubmit)}
+          className="h-[500px] w-[600px] relative bg-color_1 border-2 rounded-xl border-color_4 text-color_4 flex flex-col justify-between"
+        >
+          <div className="h-24 p-6 border-b border-color_3 w-full  text-color_1">
+            <input
+              type="text"
+              placeholder="Name of Group"
+              autoComplete="off"
+              autoCorrect="off"
+              spellCheck="false"
+              className="w-full px-4 py-2 rounded-xl"
+              {...register("name", {
+                required: true,
+              })}
+            />
+            <p className="text-xs h-4 ml-4 mt-1 text-red-200">
+              {errors?.name?.type === "required" && "Name is required."}
+            </p>
+          </div>
+
+          <section className="flex">
+            <div className="w-64 px-6 rounded-full flex justify-center">
+              <Image
+                src={
+                  croppedImageSrc
+                    ? URL.createObjectURL(croppedImageSrc)
+                    : groupPhoto
+                }
+                alt="groupPhoto"
+              />
+            </div>
+            <div className="h-full flex-1 flex flex-col gap-3 px-4">
+              <div className="flex justify-center">
+                <SearchFilterUsers
+                  initialUsers={initialUsers}
+                  userSelected={userSelected}
                 />
-                <p className="text-xs h-4 ml-4 mt-1 text-red-200">
-                  {errors?.name?.type === "required" && "Name is required."}
-                </p>
               </div>
 
-              <section className="flex" style={{ height: "300px" }}>
-                <div className="w-1/2 px-4 rounded-full">
-                  <Image src={update ? groupPhoto : Images.dummyGroup} />
-                  {/* <img
-                    src={update ? groupPhoto : Images.dummyGroup}
-                    alt="group photo"
-                    className="w-full rounded-full object-cover"
-                  /> */}
-                </div>
-                <div className="flex-1 h-full flex flex-col gap-3 px-4">
-                  <div className="flex justify-center">
-                    <SearchFilterUsers
-                      userSelected={userSelected}
-                      remove={removeUser}
-                      list={update && list}
-                    />
-                  </div>
+              <div className="px-4 overflow-y-scroll h-40">
+                {list.map((user, i) => {
+                  const { _id, name, photo, email } = user;
 
-                  <div className="flex-1 px-4 overflow-y-scroll h-60">
-                    {list.map((user, i) => {
-                      const { id, name, photo } = user;
+                  const userPhoto = `${environment.SERVER_URL}/${photo}`;
 
-                      const userPhoto = `${environment.SERVER_URL}/${photo}`;
-
-                      return (
-                        <div
-                          key={i}
-                          className="flex justify-between items-center mb-4"
-                        >
-                          <div className="flex justify-start items-center gap-4 ">
-                            <div className="w-[50px]">
-                              <img
-                                src={userPhoto}
-                                alt="photo"
-                                className="w-full rounded-full"
-                              />
-                            </div>
-                            <p>{name}</p>
-                          </div>
-                          <p
-                            className="text-xs text-color_3/75 cursor-pointer py-2"
-                            onClick={() => handleRemoveUser(user)}
-                          >
-                            {id !== data.id && "Remove"}
-                          </p>
+                  return (
+                    <div
+                      key={i}
+                      className="flex justify-between items-center mb-4"
+                    >
+                      <div className="flex justify-start items-center gap-4 ">
+                        <div className="w-[50px]">
+                          <img
+                            src={userPhoto}
+                            alt="photo"
+                            className="w-full rounded-full"
+                          />
                         </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </section>
+                        <div>
+                          <p className="text-sm">{name}</p>
+                          <p className="text-[10px] tracking-wider">{email}</p>
+                        </div>
+                      </div>
+                      <p
+                        className="text-xs text-color_3/75 cursor-pointer py-2"
+                        onClick={() => handleRemoveUser(user)}
+                      >
+                        {_id !== userData._id && "Remove"}
+                      </p>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </section>
 
-              <button
-                type="submit"
-                className="h-16 w-full flex justify-center items-center -outline-offset-1 outline-color_3  bg-color_2 rounded-b-xl cursor-pointer text-lg font-semibold tracking-wide"
-              >
-                {update ? "Update" : "Create"} Group Chat
-              </button>
-            </form>
+          <div className="h-16 w-full flex justify-between items-center gap-6 p-5">
+            <button
+              onClick={() => dispatch(toggleUpdateGroupChatForm(false))}
+              className="flex-1 py-2 flex justify-center items-center -outline-offset-1 outline-color_3  bg-color_2 rounded-xl cursor-pointer text-lg tracking-wide"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              className="flex-1 py-2 flex justify-center items-center -outline-offset-1 outline-color_3  bg-color_2 rounded-xl cursor-pointer text-lg tracking-wide"
+            >
+              Update Group Chat
+            </button>
           </div>
 
-          {/* MARK: CANCEL BUTTON */}
-          <div
-            className="p-2 rounded-full border border-color_4 cursor-pointer -mt-10"
-            onClick={() =>
-              dispatch(
-                update
-                  ? toggleUpdateGroupChatForm(false)
-                  : toggleGroupChatForm(false)
-              )
-            }
-          >
-            <Icons.cancel className="text-xl text-color_4" />
-          </div>
-        </div>
+          {isCropStart && (
+            <ImageCrop
+              image={originalImageFile}
+              onCrop={handleOnCrop}
+              cancelCrop={handleCancelCrop}
+            />
+          )}
+        </form>
       </section>
       <ToastContainer />
     </>

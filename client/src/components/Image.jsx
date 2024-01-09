@@ -15,16 +15,15 @@ const ImageComp = () => {
     }
   }, [isFile, file, reset]);
 
-  const Image = ({ src }) => {
+  const Image = ({ src, alt = "profile" }) => {
     return (
       <div className="w-full h-full relative">
         <img
-          src={selectedPhoto ? URL.createObjectURL(selectedPhoto) : src}
-          loading="lazy"
-          alt="profile"
+          src={src}
+          alt={alt}
           className="w-full h-full rounded-full cursor-pointer"
         />
-        <div className="absolute z-10 bottom-0 right-0 mr-4 mb-4  bg-color_4 p-1 cursor-pointer rounded-full">
+        <div className="absolute z-10 bottom-0 right-0 mr-2 mb-2  bg-color_4 p-1 cursor-pointer rounded-full">
           <ModeEditIcon className="text-color_1" onClick={onClick} />;
         </div>
         <Input />
@@ -32,7 +31,7 @@ const ImageComp = () => {
     );
   };
 
-  return { file, Image };
+  return { file: selectedPhoto, Image };
 };
 
 export default ImageComp;

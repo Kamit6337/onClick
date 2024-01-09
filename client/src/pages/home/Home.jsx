@@ -6,12 +6,16 @@ import GroupChatForm from "./components/SidebarMenu/components/GroupChatForm";
 import SearchUsers from "../../components/SearchUsers";
 import UpdateGroupChatForm from "./components/ChatRoom/components/UpdateGroupChatForm";
 import ListeningSocket from "../../components/ListeningSocket";
-import UseSocket from "../../hooks/socket/UseSocket";
+import RightClickMenu from "./components/ChatRoom/components/RightClickMenu";
+import DeleteChat from "../../hooks/mutation/DeleteChat";
+
+import HandleSocket from "./components/HandleSocket/HandleSocket";
 
 const Home = () => {
-  const { groupChatForm, updateGroupChat } = useSelector(toggleInitialState);
-  const { ToastContainer: SocketToast } = UseSocket();
-  const { ToastContainer } = ListeningSocket();
+  ListeningSocket();
+
+  const { groupChatForm, updateGroupChat, showChatOptions } =
+    useSelector(toggleInitialState);
 
   return (
     <>
@@ -33,8 +37,9 @@ const Home = () => {
       </article>
       {groupChatForm && <GroupChatForm />}
       {updateGroupChat && <UpdateGroupChatForm update={true} />}
-      <SocketToast />
-      <ToastContainer />
+      {showChatOptions.bool && <RightClickMenu data={showChatOptions.data} />}
+      <HandleSocket />
+      <DeleteChat />
     </>
   );
 };

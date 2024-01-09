@@ -1,4 +1,5 @@
 import { initSocket } from "../../lib/initSocket.js";
+import { Room } from "../../models/roomModel.js";
 import HandleGlobalError from "../../utils/HandleGlobalError.js";
 import catchAsyncError from "../../utils/catchAsyncError.js";
 
